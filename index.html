@@ -4,7 +4,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>학급 관찰 일지</title>
+  <title>학생 관찰 일지</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#036242">
+  <meta name="description" content="선생님의 기록이 우리 아이의 성장이 됩니다.">
+
+  <!-- iOS Safari PWA 지원 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="학생 관찰 일지">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -1325,6 +1336,17 @@
       }
     });
 
+  </script>
+
+  <!-- Service Worker 등록 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then((reg) => console.log('[SW] 등록 성공:', reg.scope))
+          .catch((err) => console.log('[SW] 등록 실패:', err));
+      });
+    }
   </script>
 </body>
 
