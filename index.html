@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -29,19 +30,35 @@
       }
     }
   </script>
-  
+
   <!-- Noto Sans KR -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     /* 로딩 속도를 높이기 위한 Base Custom CSS */
-    body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; color: #0f172a; -webkit-tap-highlight-color: transparent;}
-    .hide { display: none !important; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hide {
+      display: none !important;
+    }
+
     /* 숨김 스크롤바 (가로 상용구 칩 리스트용) */
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
+
 <body class="bg-background relative w-full h-full min-h-screen overflow-x-hidden">
 
   <!-- ============================================== -->
@@ -50,19 +67,22 @@
   <div id="login-view" class="fixed inset-0 bg-surface flex flex-col items-center justify-center z-50">
     <div class="text-center space-y-6 px-6">
       <div class="w-20 h-20 bg-primary text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-10 h-10">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
         </svg>
       </div>
       <h1 class="text-3xl font-bold text-textPrimary">학급 관찰 일지</h1>
       <p class="text-textSecondary text-base">선생님의 기록이 우리 아이의 성장이 됩니다.</p>
-      
+
       <div id="google-btn-container" class="mt-8 flex justify-center w-full min-h-[40px]">
         <!-- GIS 버튼이 여기에 렌더링됩니다 -->
       </div>
-      
+
       <div class="mt-10 mb-4 pt-10">
-        <a href="privacy.html" class="text-xs text-gray-400 font-medium hover:text-gray-600 underline underline-offset-2 transition-colors">
+        <a href="privacy.html"
+          class="text-xs text-gray-400 font-medium hover:text-gray-600 underline underline-offset-2 transition-colors">
           개인정보 처리방침 및 약관 안내
         </a>
       </div>
@@ -73,32 +93,30 @@
   <!-- 1. Main Application View                       -->
   <!-- ============================================== -->
   <div id="app-view" class="hide flex flex-col h-screen">
-    
+
     <!-- Header -->
     <header class="bg-surface px-5 py-4 border-b border-borderDiv sticky top-0 z-10 flex justify-between items-center">
-      <h1 class="text-xl font-bold text-textPrimary">우리 학급 현황</h1>
-      <!-- Avatar/Logout -->
-      <div class="relative cursor-pointer" id="btn-logout-trigger">
-        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xs" id="user-avatar-initial">T</div>
+      <div id="btn-open-class-sheet"
+        class="flex items-center gap-1 cursor-pointer active:opacity-70 transition-opacity p-1 -ml-1 rounded-lg">
+        <h1 id="main-class-text" class="text-xl font-bold text-textPrimary">우리 학급 현황</h1>
+        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </div>
+      <!-- Avatar/Logout (Settings Trigger) -->
+      <div class="relative cursor-pointer" id="btn-settings-trigger">
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xs"
+          id="user-avatar-initial">T</div>
       </div>
     </header>
 
-    <!-- Content (Student Grid) -->
+    <!-- Content -->
     <main class="flex-1 overflow-y-auto p-5 pb-32">
-      <div id="student-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <!-- Students will be injected here -->
       <!-- Home Tab -->
       <div id="home-tab" class="px-4 transition-opacity">
         <div id="student-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
           <!-- JS rendered grid -->
         </div>
-        
-        <!-- Wizard Trigger FAB -->
-        <button id="btn-fab-wizard" class="fixed right-6 bottom-24 w-14 h-14 bg-primary text-white rounded-full shadow-[0_4px_12px_rgba(3,98,66,0.4)] flex items-center justify-center hover:bg-primaryHover active:scale-95 transition-transform z-20" aria-label="연속 관찰 마법사 열기">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-          </svg>
-        </button>
       </div>
 
       <!-- Stats Dashbaord Tab -->
@@ -111,24 +129,68 @@
         </div>
         <div class="mt-4 bg-surface rounded-xl shadow-sm border border-borderDiv p-5">
           <h3 class="text-base font-bold text-red-600 flex items-center">
-            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            요주의 학생 (상담 권장)
+            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+              </path>
+            </svg>
+            우선 관심 학생
           </h3>
           <ul id="warning-list" class="mt-3 divide-y divide-gray-100/60">
-             <!-- warning list generated by JS -->
+            <!-- warning list generated by JS -->
+          </ul>
+        </div>
+
+        <!-- Unobserved List -->
+        <div class="mt-4 bg-surface rounded-xl shadow-sm border border-borderDiv p-5">
+          <h3 class="text-base font-bold text-indigo-600 flex items-center">
+            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            관찰이 필요한 학생 (최근 기록 없음)
+          </h3>
+          <ul id="unobserved-list" class="mt-3 divide-y divide-gray-100/60">
+            <!-- JS -->
+          </ul>
+        </div>
+
+        <div class="mt-4 bg-surface rounded-xl shadow-sm border border-borderDiv p-5 mb-10">
+          <h3 class="text-base font-bold text-textPrimary flex items-center">
+            <svg class="w-5 h-5 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+              </path>
+            </svg>
+            전체 학생 명단
+          </h3>
+          <ul id="all-student-list" class="mt-3 divide-y divide-gray-100/60">
+            <!-- all student list generated by JS -->
           </ul>
         </div>
       </div>
     </main>
 
     <!-- Bottom Nav -->
-    <nav class="fixed bottom-0 w-full bg-surface border-t border-borderDiv flex justify-around items-center h-16 z-20 pb-safe">
-      <div id="nav-home" class="flex flex-col items-center justify-center text-primary w-full h-full cursor-pointer transition-colors active:bg-gray-50">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" /><path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" /></svg>
+    <nav
+      class="fixed bottom-0 w-full bg-surface border-t border-borderDiv flex justify-around items-center h-16 z-20 pb-safe">
+      <div id="nav-home"
+        class="flex flex-col items-center justify-center text-primary w-full h-full cursor-pointer transition-colors active:bg-gray-50">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+          <path
+            d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
+          <path
+            d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" />
+        </svg>
         <span class="text-[11px] mt-1 font-medium">홈</span>
       </div>
-      <div id="nav-stats" class="flex flex-col items-center justify-center text-textSecondary w-full h-full cursor-pointer transition-colors active:bg-gray-50">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+      <div id="nav-stats"
+        class="flex flex-col items-center justify-center text-textSecondary w-full h-full cursor-pointer transition-colors active:bg-gray-50">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+        </svg>
         <span class="text-[11px] mt-1 font-medium">통계 조회</span>
       </div>
     </nav>
@@ -137,123 +199,248 @@
   <!-- ============================================== -->
   <!-- 2. Bottom Sheet Modal (Scenario A)               -->
   <!-- ============================================== -->
-  <div id="backdrop" class="fixed inset-0 bg-black/40 z-30 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+  <div id="backdrop"
+    class="fixed inset-0 bg-black/40 z-30 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
 
-  <div id="bottom-sheet" class="fixed inset-x-0 bottom-0 bg-surface rounded-t-2xl shadow-xl z-40 transform translate-y-full transition-transform duration-300 flex flex-col max-h-[85vh]">
-    <div class="px-5 py-4 border-b border-borderDiv flex justify-between items-center bg-surface rounded-t-2xl sticky top-0">
+  <div id="bottom-sheet"
+    class="fixed inset-x-0 bottom-0 bg-surface rounded-t-2xl shadow-xl z-40 transform translate-y-full transition-transform duration-300 flex flex-col max-h-[85vh]">
+    <div
+      class="px-5 py-4 border-b border-borderDiv flex justify-between items-center bg-surface rounded-t-2xl sticky top-0">
       <h2 id="bs-student-name" class="text-xl font-bold text-textPrimary">학생 태그 추가</h2>
       <button id="btn-close-bs" class="p-2 -mr-2 text-textSecondary active:bg-gray-100 rounded-full">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+          class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
-    
+
     <div class="p-5 flex-1 overflow-y-auto">
       <h3 class="text-sm font-medium text-textSecondary mb-3">관찰 태그 (다중 선택)</h3>
       <div id="chip-container" class="flex flex-wrap gap-2">
         <!-- JS rendered chips -->
       </div>
-      
+
       <div class="mt-8 border-t border-borderDiv pt-4">
-        <button id="btn-toggle-memo" class="text-primary font-medium text-sm flex items-center mb-2 active:bg-gray-50 px-2 py-1 -ml-2 rounded w-max">
-          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        <button id="btn-toggle-memo"
+          class="text-primary font-medium text-sm flex items-center mb-2 active:bg-gray-50 px-2 py-1 -ml-2 rounded w-max">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
           상세 메모 추가 (선택)
         </button>
         <div id="memo-container" class="hide flex flex-col gap-2 mt-2">
-          <textarea id="memo-input" class="w-full border border-borderDiv rounded-lg p-3 text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent min-h-[100px]" placeholder="구체적인 관찰 내용을 입력하세요..."></textarea>
+          <textarea id="memo-input"
+            class="w-full border border-borderDiv rounded-lg p-3 text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent min-h-[100px]"
+            placeholder="구체적인 관찰 내용을 입력하세요..."></textarea>
           <div class="flex gap-2 overflow-x-auto pb-2 flex-nowrap hide-scrollbar">
-            <button class="preset-chip shrink-0 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200 active:bg-gray-200">개념 이해가 빠름</button>
-            <button class="preset-chip shrink-0 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200 active:bg-gray-200">주변 친구들을 잘 도와줌</button>
-            <button class="preset-chip shrink-0 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200 active:bg-gray-200">어려운 문제도 끝까지 시도함</button>
+            <button
+              class="preset-chip shrink-0 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200 active:bg-gray-200">개념
+              이해가 빠름</button>
+            <button
+              class="preset-chip shrink-0 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200 active:bg-gray-200">주변
+              친구들을 잘 도와줌</button>
+            <button
+              class="preset-chip shrink-0 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200 active:bg-gray-200">어려운
+              문제도 끝까지 시도함</button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="p-4 border-t border-borderDiv bg-surface pb-safe">
-      <button id="btn-save-bs" class="w-full h-14 bg-primary text-white font-medium text-lg rounded-lg shadow active:scale-[0.98] transition-transform flex items-center justify-center">
+      <button id="btn-save-bs"
+        class="w-full h-14 bg-primary text-white font-medium text-lg rounded-lg shadow active:scale-[0.98] transition-transform flex items-center justify-center">
         저장
       </button>
     </div>
   </div>
 
   <!-- ============================================== -->
-  <!-- 3. Wizard Modal (Scenario B)                     -->
+  <!-- 3.5 Class Selector Bottom Sheet Modal            -->
   <!-- ============================================== -->
-  <div id="wizard-modal" class="fixed inset-0 bg-surface z-50 transform translate-y-full transition-transform duration-300 pointer-events-none flex flex-col">
-    <!-- Wizard Header -->
-    <div class="px-3 py-3 border-b border-borderDiv bg-surface flex items-center pt-safe shadow-sm">
-      <button id="btn-close-wizard" class="p-2 text-textSecondary active:bg-gray-100 rounded-full">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+  <div id="class-backdrop"
+    class="fixed inset-0 bg-black/60 z-[60] opacity-0 pointer-events-none transition-opacity duration-300"></div>
+  <div id="class-sheet"
+    class="fixed bottom-0 left-0 right-0 bg-surface rounded-t-3xl shadow-2xl z-[70] transform translate-y-full transition-transform duration-300 flex flex-col pointer-events-none max-h-[80vh]">
+    <div class="px-6 py-5 border-b border-borderDiv flex justify-between items-center">
+      <h3 class="text-lg font-bold text-textPrimary">조회할 학급 선택</h3>
+      <button id="btn-close-class-sheet"
+        class="p-2 -mr-2 text-textSecondary active:bg-gray-100 rounded-full transition-colors">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
-      <div class="flex-1 mx-4 relative">
-        <div class="h-2 bg-gray-100 border border-gray-200 rounded-full overflow-hidden">
-          <div id="wizard-progress" class="h-full bg-primary transition-all duration-300 relative" style="width: 0%">
-             <div class="absolute right-0 top-0 bottom-0 w-5 bg-white opacity-20"></div>
+    </div>
+    <div class="p-6 overflow-y-auto w-full max-w-lg mx-auto pb-safe">
+      <div id="class-list-container" class="space-y-3">
+        <!-- Classes will be injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 4. Settings & Class Management Modal (Phase 5) -->
+  <!-- ============================================== -->
+  <div id="settings-modal"
+    class="fixed inset-0 bg-surface z-50 transform translate-y-full transition-transform duration-300 flex flex-col pointer-events-none">
+    <div class="px-5 py-4 border-b border-borderDiv flex justify-between items-center bg-surface sticky top-0 pt-safe">
+      <h2 class="text-xl font-bold text-textPrimary flex items-center">
+        <svg class="w-6 h-6 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+          </path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+          </path>
+        </svg>
+        학급 및 명단 관리
+      </h2>
+      <button id="btn-close-settings" class="p-2 -mr-2 text-textSecondary active:bg-gray-100 rounded-full">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-5 pb-32">
+      <!-- Class Editing Context -->
+      <div class="mb-4">
+        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2">편집할 학급 선택</label>
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <select id="settings-class-selector"
+              class="w-full border border-gray-300 shadow-sm rounded-lg p-3 text-sm font-bold bg-white text-textPrimary focus:ring-primary focus:border-primary appearance-none outline-none cursor-pointer">
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+              </svg>
+            </div>
           </div>
+          <button id="btn-add-class"
+            class="px-4 bg-gray-100 border border-gray-200 text-gray-700 font-bold rounded-lg text-sm active:bg-gray-200 whitespace-nowrap">+
+            반 추가</button>
         </div>
       </div>
-      <span id="wizard-counter" class="text-xs font-semibold text-textSecondary min-w-[32px] text-right">0/0</span>
-    </div>
-    
-    <!-- Wizard Body -->
-    <div class="flex-1 flex flex-col items-center justify-center p-6 text-center overflow-hidden relative">
-       <!-- Background decoration element -->
-       <div class="absolute opacity-5 -top-10 -right-10 w-64 h-64 bg-primary rounded-full filter blur-3xl pointer-events-none"></div>
 
-      <div class="bg-gray-50 border border-dashed border-gray-300 text-gray-500 rounded-lg px-3 py-1 text-xs font-medium mb-4">
-         최근 평가가 누락된 학생
+      <div class="bg-gray-50 border border-dashed border-primary/30 rounded-xl p-4 mb-6 shadow-sm">
+        <h3 class="text-sm font-bold text-primary mb-2 text-center">명단 텍스트 붙여넣기 (대량 등록)</h3>
+        <p class="text-[11px] text-textSecondary mb-3 leading-relaxed text-center">
+          엑셀, 나이스, 카톡 등에서 이름 명단을 복사하여 붙여넣으세요.<br>
+          <span class="text-gray-400">(번호와 이름이 공백, 탭, 콤마, 엔터 등으로 구분되어 있으면 자동 인식됩니다.)</span>
+        </p>
+        <div class="flex flex-col gap-2">
+          <textarea id="csv-text-input"
+            class="w-full h-24 border border-gray-300 rounded-lg p-3 text-sm focus:ring-primary focus:border-primary resize-none hide-scrollbar text-center"
+            placeholder="예:&#13;&#10;1 김철수&#13;&#10;2 박영희"></textarea>
+          <button id="btn-csv-parse"
+            class="w-full py-2.5 bg-white border border-gray-200 shadow-sm rounded-lg text-sm font-bold text-gray-800 active:bg-gray-50 flex items-center justify-center transition-colors">
+            <svg class="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2v1m-6 4h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+              </path>
+            </svg>
+            명단 자동 추출
+          </button>
+        </div>
       </div>
-      <h1 id="wizard-student-name" class="text-[40px] font-extrabold text-textPrimary tracking-tight mb-8">안지정</h1>
-      
-      <!-- Quick Tags for Wizard -->
-      <div class="grid grid-cols-2 gap-4 w-full max-w-[340px]">
-        <button class="wizard-btn-tag py-6 flex flex-col items-center justify-center bg-white shadow border border-gray-100 rounded-2xl active:bg-indigo-50 active:scale-[0.98] transition-all" data-tag="t2" aria-label="집중 우수">
-           <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-2 shadow-inner">
-             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-           </div>
-           <span class="text-base font-bold text-gray-800">집중 우수</span>
-        </button>
-        <button class="wizard-btn-tag py-6 flex flex-col items-center justify-center bg-white shadow border border-gray-100 rounded-2xl active:bg-amber-50 active:scale-[0.98] transition-all" data-tag="t4" aria-label="산만함">
-           <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-2 shadow-inner">
-             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-           </div>
-           <span class="text-base font-bold text-gray-800">산만함</span>
-        </button>
-        <button class="wizard-btn-tag py-4 flex flex-col justify-center items-center bg-white shadow border border-gray-100 rounded-2xl active:bg-sky-50 active:scale-[0.98] transition-all col-span-2" data-tag="t1">
-           <div class="flex items-center text-sky-600 gap-2">
-             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-             <span class="text-base font-bold text-gray-800">특이사항 없음 (외향/밝음)</span>
-           </div>
+
+      <div class="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
+        <h3 class="font-bold text-textPrimary">현재 등록 학생 (<span id="settings-count">0</span>명)</h3>
+        <button id="btn-add-student-row"
+          class="text-xs font-bold text-primary px-3 py-1.5 bg-green-50 rounded border border-green-200 active:bg-green-100">+
+          새 학생 폼</button>
+      </div>
+      <div id="settings-student-list" class="space-y-2">
+        <!-- JS Injected List -->
+      </div>
+
+      <div class="mt-12 pt-6 flex justify-center">
+        <button id="btn-logout"
+          class="py-2 px-6 bg-red-50 text-red-600 font-bold text-sm shadow-sm rounded-full border border-red-100 active:bg-red-100 flex items-center">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          구글 계정 로그아웃
         </button>
       </div>
     </div>
-    
-    <div class="p-6 pb-safe bg-surface flex justify-center sticky bottom-0">
-      <button id="btn-wizard-skip" class="w-full max-w-[340px] h-14 border border-gray-300 text-gray-600 font-medium active:bg-gray-100 transition-colors rounded-xl flex items-center justify-center relative shadow-sm">
-        <span class="absolute left-6">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </span>
-        지금은 평가 건너뛰기
+
+    <div class="p-4 border-t border-borderDiv bg-surface pb-safe sticky bottom-0">
+      <button id="btn-save-settings"
+        class="w-full h-14 bg-primary text-white font-medium text-lg rounded-xl shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center">
+        명단 일괄 저장
       </button>
     </div>
   </div>
 
+  <!-- CSV Confirm Dialog Overlay -->
+  <div id="csv-prompt-modal"
+    class="fixed inset-0 bg-black/60 z-[60] hide flex flex-col items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-[320px] shadow-2xl">
+      <h3 class="text-lg font-bold mb-2 text-center text-gray-900">CSV 데이터 확인</h3>
+      <p class="text-sm text-gray-600 mb-6 text-center leading-relaxed"><span id="csv-parsed-count"
+          class="font-bold text-primary">0</span>명의 데이터가 파싱되었습니다.<br>어떻게 등록하시겠습니까?</p>
+      <div class="space-y-3">
+        <button id="btn-csv-overwrite"
+          class="w-full py-3 bg-red-50 text-red-700 font-bold text-sm rounded-xl border border-red-200 active:bg-red-100">🚫
+          기존 명단 덮어쓰기 (초기화)</button>
+        <button id="btn-csv-append"
+          class="w-full py-3 bg-indigo-50 text-indigo-700 font-bold text-sm rounded-xl border border-indigo-200 active:bg-indigo-100">➕
+          기존 명단 아래 이어서 추가</button>
+        <button id="btn-csv-cancel"
+          class="w-full py-3 bg-gray-100 text-gray-500 font-bold text-sm rounded-xl active:bg-gray-200">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Modal -->
+  <div id="history-modal"
+    class="fixed inset-0 bg-surface z-50 transform translate-y-full transition-transform duration-300 flex flex-col pointer-events-none">
+    <div
+      class="px-5 py-4 border-b border-borderDiv flex justify-between items-center bg-surface sticky top-0 pt-safe z-10 shadow-sm">
+      <h2 id="history-student-name" class="text-xl font-bold text-textPrimary">학생 기록 상세</h2>
+      <button id="btn-close-history" class="p-2 -mr-2 text-textSecondary active:bg-gray-100 rounded-full">
+        <svg fill="none" class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto bg-gray-50 p-4">
+      <ul id="history-list" class="space-y-3">
+        <!-- JS rendered items -->
+      </ul>
+      <div id="history-loading" class="hide flex justify-center items-center py-10">
+        <div class="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+      <div id="history-empty" class="hide text-center py-12 text-textSecondary text-sm">
+        기록된 관찰 내용이 없습니다.
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Message Box -->
-  <div id="toast-container" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center space-y-2 pointer-events-none"></div>
+  <div id="toast-container"
+    class="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center space-y-2 pointer-events-none">
+  </div>
 
   <!-- ============================================== -->
   <!-- Firebase & Application Logic                   -->
   <!-- ============================================== -->
   <!-- Google Identity Services (GIS) API -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  
+
   <script type="module">
     //==========================================
     // 1. Firebase Initializing
     //==========================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, runTransaction, serverTimestamp, query, where, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, runTransaction, serverTimestamp, query, where, orderBy, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
     // Firebase 웹 앱 설정 (선생님 발급 키 적용 완료)
     const firebaseConfig = {
@@ -278,9 +465,9 @@
       students: [], // db mock
       activeStudentId: null,
       selectedTags: new Set(),
-      // Wizard Properties
-      wizardQueue: [],
-      wizardCurrentIndex: 0,
+      classes: [],              // 보유 중인 학급 배열 (고유 className 모음)
+      activeClass: '',          // 메인 화면 활성 학급
+      settingsActiveClass: ''   // 설정 모달 내 활성 학급
     };
 
     const TAG_CATEGORIES = {
@@ -298,6 +485,15 @@
       { id: 't4', label: '산만함', cat: '주의' },
       { id: 't5', label: '지각', cat: '주의' },
       { id: 't6', label: '친구와 갈등', cat: '경고' },
+      { id: 't7', label: '발표 적극적', cat: '학습' },
+      { id: 't8', label: '친구 배려/도움', cat: '긍정' },
+      { id: 't9', label: '숙제 미제출', cat: '주의' },
+      { id: 't10', label: '준비물 미지참', cat: '주의' },
+      { id: 't11', label: '예의 바름', cat: '생활' },
+      { id: 't12', label: '수업 참여도 높음', cat: '학습' },
+      { id: 't13', label: '장난 심함', cat: '경고' },
+      { id: 't14', label: '비속어/욕설', cat: '경고' },
+      { id: 't15', label: '무단 이탈', cat: '경고' },
     ];
 
     //==========================================
@@ -306,18 +502,18 @@
     const DOM = {
       login: document.getElementById('login-view'),
       app: document.getElementById('app-view'),
-      btnLogout: document.getElementById('btn-logout-trigger'),
+      btnLogout: document.getElementById('btn-logout'),
       grid: document.getElementById('student-grid'),
       toast: document.getElementById('toast-container'),
       avatarInit: document.getElementById('user-avatar-initial'),
       googleBtnContainer: document.getElementById('google-btn-container'),
-      
+
       // Navigation Tabs
       navHome: document.getElementById('nav-home'),
       navStats: document.getElementById('nav-stats'),
       homeTab: document.getElementById('home-tab'),
       statsTab: document.getElementById('stats-tab'),
-      
+
       // Bottom Sheet DOMs
       backdrop: document.getElementById('backdrop'),
       bottomSheet: document.getElementById('bottom-sheet'),
@@ -328,17 +524,49 @@
       btnToggleMemo: document.getElementById('btn-toggle-memo'),
       memoContainer: document.getElementById('memo-container'),
       memoInput: document.getElementById('memo-input'),
-      
-      // Wizard DOMs
-      btnFabWizard: document.getElementById('btn-fab-wizard'),
-      wizardModal: document.getElementById('wizard-modal'),
-      btnCloseWizard: document.getElementById('btn-close-wizard'),
-      wizardProgress: document.getElementById('wizard-progress'),
-      wizardCounter: document.getElementById('wizard-counter'),
-      wizardStudentName: document.getElementById('wizard-student-name'),
-      btnWizardSkip: document.getElementById('btn-wizard-skip'),
+
+      // Stats DOMs
       classChart: document.getElementById('class-chart') ? document.getElementById('class-chart').getContext('2d') : null,
       warningList: document.getElementById('warning-list'),
+      unobservedList: document.getElementById('unobserved-list'),
+      allStudentList: document.getElementById('all-student-list'),
+
+      // Header DOMs
+      btnOpenClassSheet: document.getElementById('btn-open-class-sheet'),
+      mainClassText: document.getElementById('main-class-text'),
+      classBackdrop: document.getElementById('class-backdrop'),
+      classSheet: document.getElementById('class-sheet'),
+      btnCloseClassSheet: document.getElementById('btn-close-class-sheet'),
+      classListContainer: document.getElementById('class-list-container'),
+
+      // Settings DOMs
+      btnSettings: document.getElementById('btn-settings-trigger'),
+      settingsClassSelector: document.getElementById('settings-class-selector'),
+      btnAddClass: document.getElementById('btn-add-class'),
+      settingsModal: document.getElementById('settings-modal'),
+      btnCloseSettings: document.getElementById('btn-close-settings'),
+      btnSaveSettings: document.getElementById('btn-save-settings'),
+      settingsStudentList: document.getElementById('settings-student-list'),
+      btnAddStudentRow: document.getElementById('btn-add-student-row'),
+      settingsCount: document.getElementById('settings-count'),
+      // (btnLogout는 상단에서 참조됨)
+
+      // History Modal DOMs
+      historyModal: document.getElementById('history-modal'),
+      historyStudentName: document.getElementById('history-student-name'),
+      btnCloseHistory: document.getElementById('btn-close-history'),
+      historyList: document.getElementById('history-list'),
+      historyLoading: document.getElementById('history-loading'),
+      historyEmpty: document.getElementById('history-empty'),
+
+      // CSV DOMs
+      btnCsvParse: document.getElementById('btn-csv-parse'),
+      csvTextInput: document.getElementById('csv-text-input'),
+      csvPromptModal: document.getElementById('csv-prompt-modal'),
+      btnCsvOverwrite: document.getElementById('btn-csv-overwrite'),
+      btnCsvAppend: document.getElementById('btn-csv-append'),
+      btnCsvCancel: document.getElementById('btn-csv-cancel'),
+      csvParsedCount: document.getElementById('csv-parsed-count'),
     };
 
     const showToast = (message, type = 'success') => {
@@ -347,23 +575,33 @@
       el.className = `px-4 py-3 rounded-lg shadow-lg text-sm font-medium text-white transition-opacity duration-300 ${isError ? 'bg-red-600' : 'bg-gray-800'}`;
       el.textContent = message;
       DOM.toast.appendChild(el);
-      
+
       setTimeout(() => { el.style.opacity = '0'; }, 2000);
-      setTimeout(() => { if(el.parentNode) el.remove(); }, 2300);
+      setTimeout(() => { if (el.parentNode) el.remove(); }, 2300);
     };
 
     const toggleView = (isLoggedIn) => {
-      if(isLoggedIn) {
+      if (isLoggedIn) {
         DOM.login.classList.add('hide');
         DOM.app.classList.remove('hide');
       } else {
         DOM.login.classList.remove('hide');
         DOM.app.classList.add('hide');
+        if (DOM.settingsModal) {
+          DOM.settingsModal.classList.add('translate-y-full', 'pointer-events-none');
+          DOM.settingsModal.classList.remove('translate-y-0');
+        }
       }
     };
 
     const renderStudents = () => {
-      DOM.grid.innerHTML = state.students.map(s => `
+      const activeStudents = state.students.filter(s => s.isActive !== false && s.className === state.activeClass);
+
+      if (activeStudents.length === 0) {
+        DOM.grid.innerHTML = `<div class="col-span-2 md:col-span-3 text-center py-12 text-textSecondary text-sm bg-gray-50 border border-dashed border-gray-300 rounded-xl">[${state.activeClass}] 명단이 비어있습니다.<br><br>우측 상단의 <span class="font-bold">설정 메뉴</span>에서 학생을 추가해주세요.</div>`;
+        return;
+      }
+      DOM.grid.innerHTML = activeStudents.map(s => `
         <div class="bg-white border border-borderDiv rounded-lg p-4 shadow-sm flex flex-col items-center relative transition-transform">
           <div class="text-lg font-semibold text-textPrimary">${s.name}</div>
           <div class="text-xs text-textSecondary mt-1">${s.studentNo}번</div>
@@ -373,7 +611,7 @@
           </button>
         </div>
       `).join('');
-      
+
       // Bottom Sheet 트리거 이벤트 바인딩
       document.querySelectorAll('.btn-open-bs').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -390,8 +628,8 @@
         const isSelected = state.selectedTags.has(tag.id);
         const color = TAG_CATEGORIES[tag.cat];
         // 48px 이상 터치 영역 및 상태별 컬러 분기 (선택 시 굵고 진하게)
-        const classStr = isSelected 
-          ? `${color.bg} ${color.text} ${color.border} active:scale-95 border-2 min-h-[48px] font-semibold opacity-100 shadow-sm` 
+        const classStr = isSelected
+          ? `${color.bg} ${color.text} ${color.border} active:scale-95 border-2 min-h-[48px] font-semibold opacity-100 shadow-sm`
           : `bg-white text-slate-600 border-slate-300 active:bg-slate-50 active:scale-95 min-h-[48px] font-medium opacity-90 border border-dashed`;
 
         return `<button class="chip px-4 py-2 rounded-full flex justify-center items-center transition-all ${classStr}" data-id="${tag.id}">
@@ -415,9 +653,9 @@
       DOM.bsStudentName.textContent = `${studentName} 관찰 추가`;
       DOM.memoInput.value = '';
       DOM.memoContainer.classList.add('hide'); // 메모 닫아둠 (점진적 공개)
-      
+
       renderChips(); // 렌더링 초기화
-      
+
       // 슬라이딩 애니메이션 실행
       DOM.backdrop.classList.remove('pointer-events-none', 'opacity-0');
       DOM.backdrop.classList.add('opacity-100');
@@ -436,7 +674,7 @@
     // Bottom Sheet Event Listeners
     DOM.btnCloseBs.addEventListener('click', closeBottomSheet);
     DOM.backdrop.addEventListener('click', closeBottomSheet);
-    
+
     // 메모 아코디언 토글
     DOM.btnToggleMemo.addEventListener('click', () => {
       DOM.memoContainer.classList.toggle('hide');
@@ -455,35 +693,41 @@
     // 3.2 낙관적 UI 업데이트 및 롤백 로직 (Save)
     //==========================================
     DOM.btnSaveBs.addEventListener('click', async () => {
-      if(state.selectedTags.size === 0 && DOM.memoInput.value.trim() === '') {
+      if (state.selectedTags.size === 0 && DOM.memoInput.value.trim() === '') {
         showToast('최소 1개의 태그 또는 메모를 작성해 주세요.', 'error');
         return;
       }
-      
+
       const stIndex = state.students.findIndex(s => s.id === state.activeStudentId);
-      if(stIndex === -1) return;
+      if (stIndex === -1) return;
 
       // 1. Rollback용 데이터 백업 깊은 복사
       const prevStudentState = JSON.parse(JSON.stringify(state.students[stIndex]));
-      
+
       // 태그 연산
       let warningDelta = 0; let positiveDelta = 0;
       Array.from(state.selectedTags).forEach(id => {
         const t = TAGS.find(x => x.id === id);
-        if(t.cat === '주의' || t.cat === '경고') warningDelta++;
-        if(t.cat === '긍정' || t.cat === '학습' || t.cat === '생활') positiveDelta++;
+        if (t.cat === '주의' || t.cat === '경고') warningDelta++;
+        if (t.cat === '긍정' || t.cat === '학습' || t.cat === '생활') positiveDelta++;
       });
 
       // 2. Optimistic UI 선 반영 및 뷰 새로고침
       state.students[stIndex].warningTagCount += warningDelta;
       state.students[stIndex].positiveTagCount += positiveDelta;
-      
+      state.students[stIndex].lastObservedAt = new Date(); // 최근 관찰 시각 갱신
+
       renderStudents();        // 화면 즉시 리렌더링
       closeBottomSheet();      // 체감 지연 0초
-      showToast('성공적으로 저장되었습니다.'); 
+      showToast('성공적으로 저장되었습니다.');
 
       // 3. 백그라운드 서버 전송 (실패 시 롤백 수행)
       try {
+        if (state.user?.isDev) {
+          console.log('[DEV Mode] DB Write bypassed.');
+          return;
+        }
+
         // 실제 관찰 기록 추가 및 역정규화 카운트 트랜잭션 업데이트
         const obsRef = collection(db, 'observations');
         await addDoc(obsRef, {
@@ -493,14 +737,15 @@
           memo: DOM.memoInput.value.trim(),
           createdAt: serverTimestamp()
         });
-        
+
         const stRef = doc(db, 'students', state.activeStudentId);
         await runTransaction(db, async (transaction) => {
           const docSnap = await transaction.get(stRef);
-          if(!docSnap.exists()) throw new Error("데이터 없음");
-          transaction.update(stRef, { 
-            warningTagCount: docSnap.data().warningTagCount + warningDelta, 
-            positiveTagCount: docSnap.data().positiveTagCount + positiveDelta 
+          if (!docSnap.exists()) throw new Error("데이터 없음");
+          transaction.update(stRef, {
+            warningTagCount: docSnap.data().warningTagCount + warningDelta,
+            positiveTagCount: docSnap.data().positiveTagCount + positiveDelta,
+            lastObservedAt: serverTimestamp()
           });
         });
       } catch (error) {
@@ -518,12 +763,14 @@
     let classChartInstance = null;
 
     const renderStats = () => {
-      // 1. 요주의 학생 명단 업데이트
-      const warnings = state.students.filter(s => s.warningTagCount > 0).sort((a,b) => b.warningTagCount - a.warningTagCount);
+      const activeStudents = state.students.filter(s => s.isActive !== false && s.className === state.activeClass);
+
+      // 1. 우선 관심 학생 명단 업데이트 (부정 태그 상위 3명)
+      const warnings = activeStudents.filter(s => s.warningTagCount > 0).sort((a, b) => b.warningTagCount - a.warningTagCount).slice(0, 3);
       DOM.warningList.innerHTML = warnings.length > 0
-        ? warnings.map(s => `
-          <li class="py-3 flex justify-between items-center transition-colors">
-            <span class="font-medium text-textPrimary">${s.name} <span class="text-xs text-textSecondary ml-1">${s.studentNo}번</span></span> 
+        ? warnings.map((s, rank) => `
+          <li class="py-3 flex justify-between items-center transition-colors cursor-pointer hover:bg-gray-50 active:bg-gray-100 px-2 rounded-lg btn-history-trigger" data-id="${s.id}" data-name="${s.name}">
+            <span class="font-medium text-textPrimary"><span class="text-xs font-bold text-red-400 mr-1">${rank + 1}위</span> ${s.name} <span class="text-xs text-textSecondary ml-1">${s.studentNo}번</span></span> 
             <span class="bg-red-50 text-red-600 text-xs px-2 py-1 rounded-full font-bold border border-red-100 flex items-center">
               ${s.warningTagCount}회 누적
               <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -531,16 +778,51 @@
           </li>`).join('')
         : `<li class="py-10 text-center text-sm text-textSecondary font-medium flex flex-col items-center">
              <svg class="w-10 h-10 mb-2 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-             현재 요주의 상담 대상 학생이 없습니다.
+             현재 우선 관심 학생이 없습니다.
            </li>`;
 
-      // 2. Chart.js 캔버스 렌더링
-      if(classChartInstance) classChartInstance.destroy();
-      if(!DOM.classChart || typeof Chart === 'undefined') return;
+      // 1.2 관찰이 필요한 학생 (최근 2주간 기록 없음)
+      const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+      const unobserved = activeStudents.filter(s => {
+        if (!s.lastObservedAt) return true; // 한 번도 관찰된 적 없음
+        const lastDate = s.lastObservedAt instanceof Date ? s.lastObservedAt : (s.lastObservedAt.toDate ? s.lastObservedAt.toDate() : new Date(s.lastObservedAt));
+        return lastDate < twoWeeksAgo;
+      }).sort((a, b) => a.studentNo - b.studentNo);
+      const formatLastDate = (s) => {
+        if (!s.lastObservedAt) return '기록 없음';
+        const d = s.lastObservedAt instanceof Date ? s.lastObservedAt : (s.lastObservedAt.toDate ? s.lastObservedAt.toDate() : new Date(s.lastObservedAt));
+        const diff = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+        return `${diff}일 전`;
+      };
+      DOM.unobservedList.innerHTML = unobserved.length > 0
+        ? unobserved.map(s => `
+          <li class="py-3 flex justify-between items-center transition-colors cursor-pointer hover:bg-gray-50 active:bg-gray-100 px-2 rounded-lg btn-history-trigger" data-id="${s.id}" data-name="${s.name}">
+            <span class="font-medium text-textPrimary">${s.name} <span class="text-xs text-textSecondary ml-1">${s.studentNo}번</span></span> 
+            <span class="bg-indigo-50 text-indigo-600 text-xs px-2 py-1 rounded-full font-bold border border-indigo-100 flex items-center">
+              ${formatLastDate(s)}
+            </span>
+          </li>`).join('')
+        : `<li class="py-6 text-center text-sm text-gray-400 font-medium">최근 2주 내 모든 학생의 관찰 기록이 존재합니다. 🎉</li>`;
 
-      const posTotal = state.students.reduce((acc, s) => acc + s.positiveTagCount, 0);
-      const negTotal = state.students.reduce((acc, s) => acc + s.warningTagCount, 0);
-      
+      // 1.5 전체 학생 명단 업데이트
+      const sortedActiveStudents = [...activeStudents].sort((a, b) => a.studentNo - b.studentNo);
+      DOM.allStudentList.innerHTML = sortedActiveStudents.length > 0
+        ? sortedActiveStudents.map(s => `
+          <li class="py-3 flex justify-between items-center transition-colors cursor-pointer hover:bg-gray-50 active:bg-gray-100 px-2 rounded-lg btn-history-trigger" data-id="${s.id}" data-name="${s.name}">
+            <span class="font-medium text-textPrimary">${s.name} <span class="text-xs text-textSecondary ml-1">${s.studentNo}번</span></span> 
+            <span class="bg-gray-50 text-gray-600 text-xs px-2 py-1 rounded-full font-bold border border-gray-200 flex items-center">
+              총 ${s.warningTagCount + s.positiveTagCount}건
+            </span>
+          </li>`).join('')
+        : `<li class="py-10 text-center text-sm text-textSecondary font-medium flex flex-col items-center">학생이 없습니다.</li>`;
+
+      // 2. Chart.js 캔버스 렌더링
+      if (classChartInstance) classChartInstance.destroy();
+      if (!DOM.classChart || typeof Chart === 'undefined') return;
+
+      const posTotal = activeStudents.reduce((acc, s) => acc + s.positiveTagCount, 0);
+      const negTotal = activeStudents.reduce((acc, s) => acc + s.warningTagCount, 0);
+
       // 피드백 데이터가 전혀 없을 경우 더미 플레이스홀더 출력 처리
       const hasData = posTotal > 0 || negTotal > 0;
 
@@ -564,113 +846,118 @@
           }
         }
       });
+
+      // Bind click event for history modal
+      document.querySelectorAll('.btn-history-trigger').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          openHistoryModal(e.currentTarget.dataset.id, e.currentTarget.dataset.name);
+        });
+      });
     };
 
+    const openHistoryModal = async (studentId, studentName) => {
+      DOM.historyStudentName.textContent = `${studentName} 관찰 기록 상세`;
+      DOM.historyModal.classList.remove('translate-y-full', 'pointer-events-none');
+      DOM.historyModal.classList.add('translate-y-0');
+
+      DOM.historyList.innerHTML = '';
+      DOM.historyEmpty.classList.add('hide');
+
+      if (state.user?.isDev) {
+        const mockData = [
+          { id: '1', tags: ['t4', 't6', 't13'], memo: '수업 시간에 집중하지 못하고 계속 장난을 쳤음. 지도 후 반성문 작성시킴.', createdAt: new Date(Date.now() - 3600000) },
+          { id: '2', tags: ['t1'], memo: '', createdAt: new Date(Date.now() - 86400000) }
+        ];
+        renderHistoryList(mockData);
+        return;
+      }
+
+      DOM.historyLoading.classList.remove('hide');
+      try {
+        const obsRef = collection(db, 'observations');
+        const q = query(obsRef, where('studentId', '==', studentId));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          DOM.historyEmpty.classList.remove('hide');
+        } else {
+          const records = [];
+          snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            records.push({
+              id: docSnap.id,
+              tags: data.tags || [],
+              memo: data.memo || '',
+              createdAt: data.createdAt ? data.createdAt.toDate() : new Date()
+            });
+          });
+          records.sort((a, b) => b.createdAt - a.createdAt);
+          renderHistoryList(records);
+        }
+      } catch (err) {
+        console.error(err);
+        DOM.historyEmpty.classList.remove('hide');
+        DOM.historyEmpty.textContent = '데이터 로드 오류';
+      } finally {
+        DOM.historyLoading.classList.add('hide');
+      }
+    };
+
+    const renderHistoryList = (records) => {
+      if (records.length === 0) {
+        DOM.historyEmpty.classList.remove('hide');
+        return;
+      }
+      DOM.historyList.innerHTML = records.map(r => {
+        const dateStr = r.createdAt.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', weekday: 'short' });
+        const timeStr = r.createdAt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
+        const tagsHtml = r.tags.map(tid => {
+          const t = TAGS.find(x => x.id === tid);
+          if (!t) return '';
+          const tColor = TAG_CATEGORIES[t.cat];
+          return `<span class="inline-block px-2 py-1 rounded text-xs font-bold ${tColor.bg} ${tColor.text} border ${tColor.border}">${t.label}</span>`;
+        }).join('');
+
+        return `
+                <li class="bg-white border text-left border-gray-200 rounded-xl p-4 shadow-sm flex flex-col gap-2">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                        <div class="text-xs font-bold text-gray-500 flex items-center">
+                           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                           ${dateStr} 
+                           <span class="font-medium text-gray-400 ml-1.5">${timeStr}</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 px-0.5">
+                        ${tagsHtml || '<span class="text-xs text-gray-400">선택된 태그 없음</span>'}
+                    </div>
+                    ${r.memo ? `<div class="text-sm text-gray-700 bg-gray-50 p-3 mt-1 rounded-lg border border-gray-100 whitespace-pre-wrap leading-relaxed shadow-inner">${r.memo}</div>` : ''}
+                </li>
+            `;
+      }).join('');
+    };
+
+    DOM.btnCloseHistory.addEventListener('click', () => {
+      DOM.historyModal.classList.add('translate-y-full', 'pointer-events-none');
+      DOM.historyModal.classList.remove('translate-y-0');
+    });
+
     DOM.navHome.addEventListener('click', () => {
-       DOM.homeTab.classList.remove('hide');
-       DOM.statsTab.classList.add('hide');
-       DOM.navHome.classList.replace('text-textSecondary', 'text-primary');
-       DOM.navStats.classList.replace('text-primary', 'text-textSecondary');
+      DOM.homeTab.classList.remove('hide');
+      DOM.statsTab.classList.add('hide');
+      DOM.navHome.classList.replace('text-textSecondary', 'text-primary');
+      DOM.navStats.classList.replace('text-primary', 'text-textSecondary');
     });
 
     DOM.navStats.addEventListener('click', () => {
-       DOM.homeTab.classList.add('hide');
-       DOM.statsTab.classList.remove('hide');
-       DOM.navStats.classList.replace('text-textSecondary', 'text-primary');
-       DOM.navHome.classList.replace('text-primary', 'text-textSecondary');
-       renderStats(); // 탭 이동 시 렌더링
+      DOM.homeTab.classList.add('hide');
+      DOM.statsTab.classList.remove('hide');
+      DOM.navStats.classList.replace('text-textSecondary', 'text-primary');
+      DOM.navHome.classList.replace('text-primary', 'text-textSecondary');
+      renderStats(); // 탭 이동 시 렌더링
     });
 
-    //==========================================
-    // 3.4 마법사 뷰 (Scenario B)
-    //==========================================
-    const renderWizardStep = () => {
-      const queue = state.wizardQueue;
-      const currentIdx = state.wizardCurrentIndex;
-      
-      if(currentIdx >= queue.length) {
-        closeWizard();
-        showToast(`총 ${queue.length}명의 관찰 일지 검토가 완료되었습니다 🎉`);
-        renderStudents();
-        return;
-      }
-      
-      const st = queue[currentIdx];
-      DOM.wizardStudentName.textContent = st.name;
-      DOM.wizardCounter.textContent = `${currentIdx + 1}/${queue.length}`;
-      DOM.wizardProgress.style.width = `${((currentIdx + 1) / queue.length) * 100}%`;
-    };
 
-    const openWizard = () => {
-      // 랜덤 5명 추출 (실제 앱에서는 당일 기록 없는 학생 우선 색인 로직 적용)
-      state.wizardQueue = [...state.students].sort(() => 0.5 - Math.random()).slice(0, 5);
-      state.wizardCurrentIndex = 0;
-      
-      if(state.wizardQueue.length === 0) {
-        showToast('오늘은 더 이상 관찰을 갱신할 학생이 없습니다!');
-        return;
-      }
-      
-      DOM.wizardModal.classList.remove('translate-y-full', 'pointer-events-none');
-      DOM.wizardModal.classList.add('translate-y-0');
-      renderWizardStep();
-    };
-
-    const closeWizard = () => {
-      DOM.wizardModal.classList.add('translate-y-full', 'pointer-events-none');
-      DOM.wizardModal.classList.remove('translate-y-0');
-    };
-
-    DOM.btnFabWizard.addEventListener('click', openWizard);
-    DOM.btnCloseWizard.addEventListener('click', closeWizard);
-    
-    // 건너뛰기 로직
-    DOM.btnWizardSkip.addEventListener('click', () => {
-        state.wizardCurrentIndex++;
-        renderWizardStep();
-    });
-
-    // 마법사 태그 버튼 클릭 즉시 낙관적 저장 후 넥스트 스텝 수행
-    document.querySelectorAll('.wizard-btn-tag').forEach(btn => {
-       btn.addEventListener('click', async (e) => {
-          const tagId = e.currentTarget.dataset.tag;
-          const stId = state.wizardQueue[state.wizardCurrentIndex].id;
-          const stIdx = state.students.findIndex(s => s.id === stId);
-          if(stIdx === -1) return;
-          
-          const t = TAGS.find(x => x.id === tagId);
-          
-          // 낙관적 UI 즉시 반영
-          if(t.cat === '경고' || t.cat === '주의') state.students[stIdx].warningTagCount++;
-          else state.students[stIdx].positiveTagCount++;
-          
-          // 실제 Firebase 백그라운드 비동기 DB 갱신 API 호출 (await 대기 없는 무중단 갱신)
-          const obsRef = collection(db, 'observations');
-          addDoc(obsRef, {
-            teacherUid: state.user.uid,
-            studentId: stId,
-            tags: [tagId],
-            memo: '',
-            createdAt: serverTimestamp()
-          }).catch(console.error);
-
-          const stRef = doc(db, 'students', stId);
-          runTransaction(db, async (transaction) => {
-            const docSnap = await transaction.get(stRef);
-            if(!docSnap.exists()) return;
-            const wDelta = (t.cat === '경고' || t.cat === '주의') ? 1 : 0;
-            const pDelta = (t.cat === '긍정' || t.cat === '학습' || t.cat === '생활') ? 1 : 0;
-            transaction.update(stRef, { 
-              warningTagCount: docSnap.data().warningTagCount + wDelta, 
-              positiveTagCount: docSnap.data().positiveTagCount + pDelta 
-            });
-          }).catch(console.error);
-          
-          // 다음 학생으로 시각적 턴 넘김
-          state.wizardCurrentIndex++;
-          renderWizardStep();
-       });
-    });
 
     //==========================================
     // 4. Firestore DB Fetching Logic
@@ -679,44 +966,293 @@
       try {
         const q = query(collection(db, 'students'), where('teacherUid', '==', state.user.uid), orderBy('studentNo', 'asc'));
         const snapshot = await getDocs(q);
-        
-        if(snapshot.empty) {
-           // 데이터가 아예 없는 교사의 최초 로그인인 경우, 더미 학생 명단 삽입하여 화면 제공 (온보딩)
-           const dummy = [
-             { name: '김철수', studentNo: 1, warningTagCount: 0, positiveTagCount: 0 },
-             { name: '이영희', studentNo: 2, warningTagCount: 0, positiveTagCount: 0 },
-             { name: '박지민', studentNo: 3, warningTagCount: 0, positiveTagCount: 0 },
-             { name: '정민수', studentNo: 4, warningTagCount: 0, positiveTagCount: 0 },
-             { name: '안지정', studentNo: 5, warningTagCount: 0, positiveTagCount: 0 },
-             { name: '강유리', studentNo: 6, warningTagCount: 0, positiveTagCount: 0 }
-           ];
-           state.students = [];
-           for(const d of dummy) {
-             const ref = doc(collection(db, 'students'));
-             const stData = { ...d, teacherUid: state.user.uid };
-             await setDoc(ref, stData);
-             state.students.push({ id: ref.id, ...stData });
-           }
+
+        if (snapshot.empty) {
+          state.students = [];
         } else {
-           state.students = [];
-           snapshot.forEach(docSnap => {
-              state.students.push({ id: docSnap.id, ...docSnap.data() });
-           });
+          state.students = [];
+          snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            if (!data.className) data.className = '기본 학급'; // 하위 호환성 폴백
+            state.students.push({ id: docSnap.id, ...data });
+          });
         }
+
+        // 보유 학급 추출 및 세팅
+        state.classes = Array.from(new Set(state.students.filter(s => s.isActive !== false).map(s => s.className)));
+        if (state.classes.length === 0) state.classes = ['기본 학급'];
+        if (!state.activeClass || !state.classes.includes(state.activeClass)) {
+          state.activeClass = state.classes[0];
+        }
+
+        renderClassesDropdown();
         renderStudents();
-      } catch(error) {
-         console.error('Data Load Error', error);
-         showToast('데이터베이스 초기화 에러가 발생했습니다. (보안 규칙 또는 인증 오류)', 'error');
-         // UI 마비 방지를 위한 폴백 더미 출력
-         state.students = [{ id: 'err1', name: '에러 복구 모드', studentNo: 1, warningTagCount: 0, positiveTagCount: 0 }];
-         renderStudents();
+      } catch (error) {
+        console.error('Data Load Error', error);
+        showToast('데이터베이스 초기화 에러가 발생했습니다. (보안 규칙 또는 인증 오류)', 'error');
+        // UI 마비 방지를 위한 폴백 더미 출력
+        state.students = [{ id: 'err1', name: '에러 복구 모드', studentNo: 1, warningTagCount: 0, positiveTagCount: 0 }];
+        renderStudents();
       }
     };
 
     //==========================================
+    // 4.5 Settings & Class Management Logic (Phase 6)
+    //==========================================
+    const openClassSheet = () => {
+      DOM.classListContainer.innerHTML = state.classes.map(c => {
+        const isActive = c === state.activeClass;
+        if (isActive) {
+          return `<button class="class-item-btn w-full text-left p-4 rounded-2xl border-2 border-primary bg-primary/5 text-primary font-bold flex justify-between items-center transition-all shadow-sm" data-class="${c}">
+                        <span class="text-lg">${c}</span>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                     </button>`;
+        } else {
+          return `<button class="class-item-btn w-full text-left p-4 rounded-2xl border border-gray-200 bg-white text-gray-700 font-medium active:bg-gray-50 transition-all shadow-sm hover:border-primary/30" data-class="${c}">
+                        <span class="text-lg">${c}</span>
+                     </button>`;
+        }
+      }).join('');
+
+      document.querySelectorAll('.class-item-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          state.activeClass = e.currentTarget.dataset.class;
+          renderClassesDropdown();
+          renderStudents();
+          if (!DOM.statsTab.classList.contains('hide')) {
+            renderStats(); // 통계 뷰에 있을 경우 리렌더링
+          }
+          closeClassSheet();
+        });
+      });
+
+      DOM.classBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+      DOM.classSheet.classList.remove('translate-y-full', 'pointer-events-none');
+    };
+
+    const closeClassSheet = () => {
+      DOM.classBackdrop.classList.add('opacity-0', 'pointer-events-none');
+      DOM.classSheet.classList.add('translate-y-full', 'pointer-events-none');
+    };
+
+    DOM.btnOpenClassSheet.addEventListener('click', openClassSheet);
+    DOM.classBackdrop.addEventListener('click', closeClassSheet);
+    DOM.btnCloseClassSheet.addEventListener('click', closeClassSheet);
+
+    const renderClassesDropdown = () => {
+      DOM.mainClassText.textContent = state.activeClass || '학급 분리 전';
+    };
+
+    const renderSettingsStudentList = () => {
+      DOM.settingsCount.textContent = state.settingsStudents.length;
+      DOM.settingsStudentList.innerHTML = state.settingsStudents.map((s, index) => `
+        <div class="flex items-center gap-2 bg-white p-3 rounded-lg border shadow-sm ${s.isActive === false ? 'border-red-200 bg-red-50 opacity-60' : 'border-gray-200'}">
+           <input type="number" class="w-16 border rounded bg-gray-50 px-2 py-2 text-sm text-center settings-input-no focus:ring-primary focus:border-primary" data-index="${index}" value="${s.studentNo}" ${s.isActive === false ? 'disabled' : ''}>
+           <input type="text" class="flex-1 border rounded bg-gray-50 px-3 py-2 text-sm settings-input-name focus:ring-primary focus:border-primary" data-index="${index}" value="${s.name}" ${s.isActive === false ? 'disabled' : ''} placeholder="이름">
+           <button class="p-2 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-red-500 active:bg-gray-100 btn-settings-del transition-colors shadow-sm" data-index="${index}" aria-label="명단 제외">
+             <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+           </button>
+        </div>
+      `).join('');
+
+      // 입력 동기화 리스너
+      document.querySelectorAll('.settings-input-no').forEach(i => i.addEventListener('change', e => { state.settingsStudents[e.target.dataset.index].studentNo = parseInt(e.target.value) || 0; }));
+      document.querySelectorAll('.settings-input-name').forEach(i => i.addEventListener('change', e => { state.settingsStudents[e.target.dataset.index].name = e.target.value.trim(); }));
+      // 토글 삭제/복원 리스너
+      document.querySelectorAll('.btn-settings-del').forEach(b => b.addEventListener('click', e => {
+        const idx = e.currentTarget.dataset.index;
+        const s = state.settingsStudents[idx];
+        if (s.id) {
+          s.isActive = s.isActive === false ? true : false;
+        } else {
+          state.settingsStudents.splice(idx, 1); // db에 없는 새 데이터면 그냥 파기
+        }
+        renderSettingsStudentList();
+      }));
+    };
+
+    const loadSettingsForCurrentClass = () => {
+      DOM.settingsClassSelector.innerHTML = state.classes.map(c => `<option value="${c}" ${c === state.settingsActiveClass ? 'selected' : ''}>${c}</option>`).join('');
+      state.settingsStudents = JSON.parse(JSON.stringify(state.students.filter(s => s.isActive !== false && s.className === state.settingsActiveClass)));
+      renderSettingsStudentList();
+    };
+
+    DOM.settingsClassSelector.addEventListener('change', (e) => {
+      state.settingsActiveClass = e.target.value;
+      loadSettingsForCurrentClass();
+    });
+
+    DOM.btnAddClass.addEventListener('click', () => {
+      const newClass = prompt('새로운 반 이름을 입력하세요:', '2학년 3반');
+      if (!newClass || newClass.trim() === '') return;
+      const clName = newClass.trim();
+      if (!state.classes.includes(clName)) {
+        state.classes.push(clName);
+        renderClassesDropdown(); // Main 헤더에도 미리 옵션 반영
+      }
+      state.settingsActiveClass = clName;
+      state.settingsStudents = [];
+      loadSettingsForCurrentClass();
+    });
+
+    DOM.btnSettings.addEventListener('click', () => {
+      state.settingsActiveClass = state.activeClass || state.classes[0];
+      loadSettingsForCurrentClass();
+      DOM.settingsModal.classList.remove('translate-y-full', 'pointer-events-none');
+      DOM.settingsModal.classList.add('translate-y-0');
+    });
+
+    DOM.btnCloseSettings.addEventListener('click', () => {
+      DOM.settingsModal.classList.add('translate-y-full', 'pointer-events-none');
+      DOM.settingsModal.classList.remove('translate-y-0');
+    });
+
+    DOM.btnAddStudentRow.addEventListener('click', () => {
+      const maxNo = state.settingsStudents.reduce((max, s) => Math.max(max, s.studentNo || 0), 0);
+      state.settingsStudents.push({ name: '', studentNo: maxNo + 1, warningTagCount: 0, positiveTagCount: 0, isActive: true, className: state.settingsActiveClass });
+      renderSettingsStudentList();
+      setTimeout(() => { DOM.settingsStudentList.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+    });
+
+    // 텍스트 복붙 파싱 로직 (탭, 콤마, 공백, 엔터 모두 지원)
+    DOM.btnCsvParse.addEventListener('click', () => {
+      const txt = DOM.csvTextInput.value.trim();
+      if (!txt) {
+        showToast('붙여넣을 텍스트가 없습니다.', 'error');
+        return;
+      }
+
+      // 탭(\t), 콤마(,), 공백( ), 엔터(\n, \r)를 모두 동일한 구분자로 취급하여 모든 단어를 토큰화
+      const tokens = txt.split(/[\t, \n\r]+/);
+      const parsed = [];
+
+      // 토큰 배열을 순회하면서 [숫자] 다음 [문자열]이 오면 한 세트로 묶음
+      for (let i = 0; i < tokens.length - 1; i++) {
+        const rawNum = tokens[i].replace(/[^0-9]/g, '');
+        const num = parseInt(rawNum);
+
+        // 현재 토큰이 정상적인 숫자인 경우
+        if (!isNaN(num) && rawNum !== '') {
+          const nameStr = tokens[i + 1].trim();
+
+          // 다음 토큰이 존재하고, '이름'이나 '성명' 같은 헤더가 아니며, 숫자로만 이루어지지 않은 경우 이름으로 인정
+          if (nameStr !== '' && nameStr !== '이름' && nameStr !== '성명' && isNaN(parseInt(nameStr.replace(/[^0-9]/g, '')))) {
+            parsed.push({ studentNo: num, name: nameStr, warningTagCount: 0, positiveTagCount: 0, isActive: true, className: state.settingsActiveClass });
+            i++; // 이름으로 사용한 토큰은 다음 숫자 탐색에서 건너뜀
+          }
+        }
+      }
+
+      state.tempCsvCache = parsed;
+      DOM.csvParsedCount.textContent = parsed.length;
+
+      if (parsed.length > 0) {
+        DOM.csvPromptModal.classList.remove('hide');
+      } else {
+        showToast('추출할 수 있는 명단 데이터가 없습니다. 형식을 확인해주세요.', 'error');
+      }
+
+      DOM.csvTextInput.value = ''; // 폼 초기화
+    });
+
+    // CSV 추가 정책 확정 액션
+    const closeCsvPrompt = () => { DOM.csvPromptModal.classList.add('hide'); };
+    DOM.btnCsvCancel.addEventListener('click', closeCsvPrompt);
+
+    // 덮어쓰기 로직: 기존 DB 연동된 애들만 id 보존 채로 isActive=false 플래그만 세움
+    DOM.btnCsvOverwrite.addEventListener('click', () => {
+      const olds = state.settingsStudents.filter(s => s.id).map(s => { s.isActive = false; return s; });
+      state.settingsStudents = [...olds, ...state.tempCsvCache];
+      renderSettingsStudentList();
+      closeCsvPrompt();
+      showToast(`기존 명단을 덮어쓰고 ${state.tempCsvCache.length}명의 데이터를 임시 로드했습니다.`);
+    });
+
+    // 이어서 추가 로직: 단순히 배열 뒤에 푸쉬
+    DOM.btnCsvAppend.addEventListener('click', () => {
+      state.settingsStudents = [...state.settingsStudents, ...state.tempCsvCache];
+      renderSettingsStudentList();
+      closeCsvPrompt();
+      showToast(`명단 아래에 ${state.tempCsvCache.length}명의 데이터를 임시로 이어서 로드했습니다.`);
+    });
+
+    // 명단 일괄 DB 저장(트랜잭션/배치) 로직
+    DOM.btnSaveSettings.addEventListener('click', async () => {
+      try {
+        DOM.btnSaveSettings.innerHTML = '<div class="w-6 h-6 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>';
+        DOM.btnSaveSettings.disabled = true;
+
+        const batch = writeBatch(db);
+        let syncCount = 0;
+
+        state.settingsStudents.forEach(st => {
+          if (!st.name || st.name.trim() === '') return; // 유효하지 않은 포뮬라 스킵
+
+          if (st.id) {
+            // Update 기존
+            const ref = doc(db, 'students', st.id);
+            batch.update(ref, { studentNo: st.studentNo, name: st.name, isActive: st.isActive !== false });
+            syncCount++;
+          } else if (st.isActive !== false) {
+            // Add 신규
+            const ref = doc(collection(db, 'students'));
+            batch.set(ref, {
+              teacherUid: state.user.uid,
+              studentNo: st.studentNo,
+              name: st.name,
+              warningTagCount: st.warningTagCount,
+              positiveTagCount: st.positiveTagCount,
+              isActive: true,
+              className: state.settingsActiveClass
+            });
+            syncCount++;
+          }
+        });
+
+        if (state.user?.isDev) {
+          console.log('[DEV Mode] Batch DB Bypass.');
+          // 개발자 모드: state.students에 편집 내용 로컬 반영
+          const cls = state.settingsActiveClass;
+          // 해당 반의 기존 학생 제거 후 설정 결과로 교체
+          state.students = state.students.filter(s => s.className !== cls);
+          state.settingsStudents.forEach(st => {
+            if (st.isActive !== false && st.name && st.name.trim() !== '') {
+              if (!st.id) st.id = 'dev_' + Math.random().toString(36).slice(2, 9);
+              st.className = cls;
+              state.students.push(st);
+            }
+          });
+          // 학급 목록 갱신
+          state.classes = Array.from(new Set(state.students.filter(s => s.isActive !== false).map(s => s.className)));
+          if (state.classes.length === 0) state.classes = ['기본 학급'];
+          if (!state.activeClass || !state.classes.includes(state.activeClass)) state.activeClass = state.classes[0];
+          renderClassesDropdown();
+          renderStudents();
+          showToast('개발자 모드: 로컬 상태에 저장 반영 완료');
+        } else if (syncCount > 0) {
+          await batch.commit();
+          showToast('학급 전체 명단이 성공적으로 동기화되었습니다.');
+        } else {
+          showToast('수정된 명단 내용이 없습니다.');
+        }
+
+        DOM.settingsModal.classList.add('translate-y-full', 'pointer-events-none');
+        DOM.settingsModal.classList.remove('translate-y-0');
+
+        if (!state.user?.isDev) await fetchStudents();
+      } catch (error) {
+        console.error(error);
+        showToast('Firestore 데이터 저장에 실패했습니다. (네트워크/방화벽 확인)', 'error');
+      } finally {
+        DOM.btnSaveSettings.innerHTML = '명단 일괄 저장';
+        DOM.btnSaveSettings.disabled = false;
+      }
+    });
+
+    //==========================================
     // 5. App Initialization & Auth Listener
     //==========================================
-    
+
     // GIS (Google Identity Services) 콜백 및 렌더링
     window.handleCredentialResponse = async (response) => {
       try {
@@ -729,26 +1265,31 @@
       }
     };
 
-    window.onload = () => {
-      if (typeof google === 'undefined') return;
+    // GIS 비동기 로드 대기 (module defer와 GIS async 간 race condition 방지)
+    const initGIS = () => {
+      if (typeof google === 'undefined' || !google.accounts) {
+        setTimeout(initGIS, 200); // 200ms 간격으로 재시도
+        return;
+      }
       google.accounts.id.initialize({
         client_id: "229156278607-0ak7ia9t66evrac5mh4r70rr67sqcf5m.apps.googleusercontent.com",
         callback: window.handleCredentialResponse
       });
       google.accounts.id.renderButton(
         DOM.googleBtnContainer,
-        { theme: "outline", size: "large", type: "standard", width: 280 }  
+        { theme: "outline", size: "large", type: "standard", width: 280 }
       );
     };
+    initGIS();
 
-    DOM.btnLogout.addEventListener('click', () => signOut(auth));
+    if (DOM.btnLogout) DOM.btnLogout.addEventListener('click', () => signOut(auth));
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         state.user = user;
         DOM.avatarInit.textContent = user.displayName ? user.displayName.charAt(0) : 'T';
         toggleView(true);
-        await fetchStudents(); 
+        await fetchStudents();
         showToast('환영합니다 선생님!');
       } else {
         state.user = null;
@@ -756,6 +1297,35 @@
       }
     });
 
+    //==========================================
+    // 6. Developer Mode (Shortcut Bypass)
+    //==========================================
+    document.addEventListener('keydown', (e) => {
+      // Ctrl + Shift + D
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        console.log('[Dev Mode] Bypassing Google Auth...');
+        state.user = { uid: 'DEV_MOCK_USER_ID_777', displayName: '개발자 모드', isDev: true };
+        DOM.avatarInit.textContent = 'D';
+        toggleView(true);
+
+        // Inject realistic dummy data for testing features without DB
+        state.classes = ['1반', '2반'];
+        state.activeClass = '1반';
+        state.students = [
+          { id: 'mock1', name: '김철수', studentNo: 1, warningTagCount: 0, positiveTagCount: 0, isActive: true, className: '1반', lastObservedAt: new Date(Date.now() - 20 * 24 * 3600000) },
+          { id: 'mock2', name: '이영희', studentNo: 2, warningTagCount: 1, positiveTagCount: 5, isActive: true, className: '1반', lastObservedAt: new Date(Date.now() - 2 * 24 * 3600000) },
+          { id: 'mock3', name: '박지민', studentNo: 3, warningTagCount: 4, positiveTagCount: 1, isActive: true, className: '1반', lastObservedAt: new Date(Date.now() - 1 * 24 * 3600000) },
+          { id: 'mock4', name: '최동원', studentNo: 4, warningTagCount: 0, positiveTagCount: 0, isActive: true, className: '2반', lastObservedAt: null },
+          { id: 'mock5', name: '유재석', studentNo: 5, warningTagCount: 0, positiveTagCount: 0, isActive: true, className: '2반', lastObservedAt: new Date(Date.now() - 30 * 24 * 3600000) },
+        ];
+        renderClassesDropdown();
+        renderStudents();
+        showToast('🛠️ 개발자 모드로 진입했습니다.');
+      }
+    });
+
   </script>
 </body>
+
 </html>
