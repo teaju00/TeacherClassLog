@@ -1,3 +1,4 @@
+<!-- BUILD_VERSION: 2026-04-25T00:10:00 -->
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -713,7 +714,7 @@
       if (stIndex === -1) return;
 
       // 1. 필요한 필드만 백업 (실패 시 롤백용)
-      const { warningTagCount, positiveTagCount, lastObservedAt } = state.students[stIndex];
+      const prevStudentState = { ...state.students[stIndex] };
 
       // 태그 연산
       let warningDelta = 0; let positiveDelta = 0;
@@ -726,6 +727,7 @@
       // 2. 즉시 UI 업데이트 및 닫기 (Optimistic Update)
       state.students[stIndex].warningTagCount += warningDelta;
       state.students[stIndex].positiveTagCount += positiveDelta;
+      state.students[stIndex].lastObservedAt = new Date();
       renderStudents();        // 화면 즉시 리렌더링
       closeBottomSheet();      // 체감 지연 0초
       showToast('성공적으로 저장되었습니다.');
@@ -884,8 +886,11 @@
       DOM.historyLoading.classList.remove('hide');
       try {
         const obsRef = collection(db, 'observations');
-        const q = query(obsRef, where('studentId', '==', studentId));
-        const snapshot = await getDocs(q);
+        const q = query(obsRef, where('teacherUid', '==', state.user.uid), where('studentId', '==', studentId));
+        
+        // Timeout wrapper for getDocs
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
+        const snapshot = await Promise.race([getDocs(q), timeoutPromise]);
 
         if (snapshot.empty) {
           DOM.historyEmpty.classList.remove('hide');
@@ -904,9 +909,21 @@
           renderHistoryList(records);
         }
       } catch (err) {
-        console.error(err);
+        console.error('History Load Error:', err);
         DOM.historyEmpty.classList.remove('hide');
-        DOM.historyEmpty.textContent = '데이터 로드 오류';
+        
+        let errMsg = '데이터 로드 오류';
+        if (err.message === 'timeout') {
+          errMsg = '서버 응답 시간 초과 (네트워크 확인)';
+        } else if (err.code === 'permission-denied') {
+          errMsg = '접근 권한 오류 (보안 규칙 확인)';
+        } else if (err.code === 'failed-precondition' || (err.message && err.message.includes('index'))) {
+          errMsg = '인덱스 생성 중입니다. 3~5분 후 다시 시도해주세요.';
+        } else {
+          errMsg = `로드 오류: ${err.code || err.message || '알 수 없음'}`;
+        }
+        
+        DOM.historyEmpty.textContent = errMsg;
       } finally {
         DOM.historyLoading.classList.add('hide');
       }
@@ -1001,7 +1018,19 @@
         renderStudents();
       } catch (error) {
         console.error('Data Load Error', error);
-        showToast('데이터베이스 초기화 에러가 발생했습니다. (보안 규칙 또는 인증 오류)', 'error');
+        
+        let errorMsg = '데이터베이스 초기화 에러가 발생했습니다.';
+        if (error.message === 'timeout') {
+            errorMsg = '서버 응답 시간이 초과되었습니다. (네트워크/방화벽 확인)';
+        } else if (error.code === 'permission-denied') {
+            errorMsg = '접근 권한이 없습니다. (보안 규칙 문제)';
+        } else if (error.message && error.message.includes('index')) {
+            errorMsg = '데이터베이스 인덱스가 아직 생성 중입니다. 5분 뒤 다시 시도해주세요.';
+        } else {
+            errorMsg = `DB 에러: ${error.message || error.code || '알 수 없는 오류'}`;
+        }
+        
+        showToast(errorMsg, 'error');
         // UI 마비 방지를 위한 폴백 더미 출력
         state.students = [{ id: 'err1', name: '에러 복구 모드', studentNo: 1, warningTagCount: 0, positiveTagCount: 0 }];
         renderStudents();

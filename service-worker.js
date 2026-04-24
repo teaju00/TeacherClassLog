@@ -1,5 +1,5 @@
 // Service Worker for 학생 관찰 일지 PWA
-const CACHE_NAME = 'class-log-v1';
+const CACHE_NAME = 'class-log-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

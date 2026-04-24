@@ -14,7 +14,9 @@ service cloud.firestore {
     
     // 1. 학생 데이터 (학생 목록 및 집계된 태그 횟수 보관)
     match /students/{studentId} {
-      allow read: if isOwner(resource.data.teacherUid);
+      allow get: if isOwner(resource.data.teacherUid);
+      allow list: if isAuthenticated()
+                  && request.auth.uid == resource.data.teacherUid;
       
       // 스키마 검증: 필수 필드가 존재하고 타입이 일치하는지 제약
       allow create: if isOwner(request.resource.data.teacherUid)
@@ -34,7 +36,9 @@ service cloud.firestore {
 
     // 2. 관찰 기록 일지 데이터 (건별 시퀀스 데이터베이스)
     match /observations/{obsId} {
-      allow read: if isOwner(resource.data.teacherUid);
+      allow get: if isOwner(resource.data.teacherUid);
+      allow list: if isAuthenticated()
+                  && request.auth.uid == resource.data.teacherUid;
       
       // 스키마 검증: 필수 필드 구조 확인. Memo는 선택이나 기본 String으로 넘어옴
       allow create: if isOwner(request.resource.data.teacherUid)
