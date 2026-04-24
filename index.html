@@ -582,6 +582,7 @@
     };
 
     const showToast = (message, type = 'success') => {
+      DOM.toast.innerHTML = '';
       const el = document.createElement('div');
       const isError = type === 'error';
       el.className = `px-4 py-3 rounded-lg shadow-lg text-sm font-medium text-white transition-opacity duration-300 ${isError ? 'bg-red-600' : 'bg-gray-800'}`;
@@ -754,8 +755,8 @@
           const docSnap = await transaction.get(stRef);
           if (!docSnap.exists()) throw new Error("데이터 없음");
           transaction.update(stRef, {
-            warningTagCount: docSnap.data().warningTagCount + warningDelta,
-            positiveTagCount: docSnap.data().positiveTagCount + positiveDelta,
+            warningTagCount: (docSnap.data().warningTagCount || 0) + warningDelta,
+            positiveTagCount: (docSnap.data().positiveTagCount || 0) + positiveDelta,
             lastObservedAt: serverTimestamp()
           });
         });

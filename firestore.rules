@@ -27,9 +27,7 @@ service cloud.firestore {
                     
       // 업데이트 제약: teacherUid를 남의 것으로 절대 바꿀 수 없도록 방어
       allow update: if isOwner(resource.data.teacherUid)
-                    && isOwner(request.resource.data.teacherUid)
-                    && request.resource.data.name is string
-                    && request.resource.data.studentNo is number;
+                    && isOwner(request.resource.data.teacherUid);
                     
       allow delete: if isOwner(resource.data.teacherUid);
     }
