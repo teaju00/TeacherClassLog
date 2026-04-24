@@ -451,7 +451,7 @@
     //==========================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, serverTimestamp, query, where, orderBy, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, serverTimestamp, query, where, orderBy, setDoc, writeBatch, runTransaction } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
     // Firebase 웹 앱 설정 (선생님 발급 키 적용 완료)
     const firebaseConfig = {
@@ -974,7 +974,10 @@
     const fetchStudents = async () => {
       try {
         const q = query(collection(db, 'students'), where('teacherUid', '==', state.user.uid), orderBy('studentNo', 'asc'));
-        const snapshot = await getDocs(q);
+        
+        // Timeout wrapper for getDocs to prevent infinite loading on network issues
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
+        const snapshot = await Promise.race([getDocs(q), timeoutPromise]);
 
         if (snapshot.empty) {
           state.students = [];
@@ -1239,7 +1242,9 @@
           renderStudents();
           showToast('개발자 모드: 로컬 상태에 저장 반영 완료');
         } else if (syncCount > 0) {
-          await batch.commit();
+          // Timeout wrapper for batch.commit() to prevent infinite loading on network drop
+          const commitTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
+          await Promise.race([batch.commit(), commitTimeout]);
           showToast('학급 전체 명단이 성공적으로 동기화되었습니다.');
         } else {
           showToast('수정된 명단 내용이 없습니다.');
@@ -1251,7 +1256,11 @@
         if (!state.user?.isDev) await fetchStudents();
       } catch (error) {
         console.error(error);
-        showToast('Firestore 데이터 저장에 실패했습니다. (네트워크/방화벽 확인)', 'error');
+        if (error.message === 'timeout') {
+           showToast('서버 응답 시간이 초과되었습니다. 네트워크 상태를 확인해주세요.', 'error');
+        } else {
+           showToast('Firestore 데이터 저장에 실패했습니다. (네트워크/방화벽 확인)', 'error');
+        }
       } finally {
         DOM.btnSaveSettings.innerHTML = '명단 일괄 저장';
         DOM.btnSaveSettings.disabled = false;
