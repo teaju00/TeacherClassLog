@@ -1,986 +1,761 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>학급 관찰 일지</title>
-    <!-- Tailwind CSS (CDN) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            DEFAULT: '#036242',
-                            hover: '#024e35',
-                        },
-                        background: '#f8fafc', // bg-slate-50
-                        textMain: '#0f172a',    // text-slate-900
-                        textMuted: '#64748b'    // text-slate-600
-                    },
-                    fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', '"Noto Sans KR"', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- 폰트 추가 (Noto Sans KR 및 구글 로그인 버튼용 Roboto) -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Roboto:wght@500&display=swap"
-        rel="stylesheet">
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
-            background-color: #f8fafc;
-            color: #0f172a;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>학급 관찰 일지</title>
 
-        /* 공통 애니메이션 유틸리티 */
-        .fade-in {
-            animation: fadeIn 0.2s ease-in-out forwards;
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN for Stats -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#036242',
+            primaryHover: '#024e35',
+            background: '#f8fafc',
+            surface: '#ffffff',
+            textPrimary: '#0f172a',
+            textSecondary: '#64748b',
+            borderDiv: '#e2e8f0',
+          },
+          fontFamily: {
+            sans: ['"Noto Sans KR"', 'sans-serif'],
+          }
         }
+      }
+    }
+  </script>
+  
+  <!-- Noto Sans KR -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .btn-ripple:active {
-            transform: scale(0.95);
-            transition: transform 0.1s;
-        }
-    </style>
+  <style>
+    /* 로딩 속도를 높이기 위한 Base Custom CSS */
+    body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; color: #0f172a; -webkit-tap-highlight-color: transparent;}
+    .hide { display: none !important; }
+    /* 숨김 스크롤바 (가로 상용구 칩 리스트용) */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
 </head>
+<body class="bg-background relative w-full h-full min-h-screen overflow-x-hidden">
 
-<body class="min-h-screen flex flex-col antialiased">
+  <!-- ============================================== -->
+  <!-- 0. Login View                                    -->
+  <!-- ============================================== -->
+  <div id="login-view" class="fixed inset-0 bg-surface flex flex-col items-center justify-center z-50">
+    <div class="text-center space-y-6 px-6">
+      <div class="w-20 h-20 bg-primary text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+        </svg>
+      </div>
+      <h1 class="text-3xl font-bold text-textPrimary">학급 관찰 일지</h1>
+      <p class="text-textSecondary text-base">선생님의 기록이 우리 아이의 성장이 됩니다.</p>
+      
+      <div id="google-btn-container" class="mt-8 flex justify-center w-full min-h-[40px]">
+        <!-- GIS 버튼이 여기에 렌더링됩니다 -->
+      </div>
+      
+      <div class="mt-10 mb-4 pt-10">
+        <a href="privacy.html" class="text-xs text-gray-400 font-medium hover:text-gray-600 underline underline-offset-2 transition-colors">
+          개인정보 처리방침 및 약관 안내
+        </a>
+      </div>
+    </div>
+  </div>
 
-
-
-    <!-- 상단 헤더 (sticky) -->
-    <header class="sticky top-0 z-40 w-full bg-white shadow-sm border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- 로고 및 제목 -->
-                <div class="flex items-center gap-2">
-                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-                        </path>
-                    </svg>
-                    <h1 class="text-xl font-bold text-slate-900">학급 관찰 일지</h1>
-                </div>
-
-                <!-- 로그인 전/후 상태에 따른 우측 영역 (JS로 전환) -->
-                <div id="header-auth-section" class="flex items-center">
-                    <!-- Placeholder: 구글로 로그인 버튼 또는 사용자 정보 -->
-                </div>
-            </div>
-        </div>
+  <!-- ============================================== -->
+  <!-- 1. Main Application View                       -->
+  <!-- ============================================== -->
+  <div id="app-view" class="hide flex flex-col h-screen">
+    
+    <!-- Header -->
+    <header class="bg-surface px-5 py-4 border-b border-borderDiv sticky top-0 z-10 flex justify-between items-center">
+      <h1 class="text-xl font-bold text-textPrimary">우리 학급 현황</h1>
+      <!-- Avatar/Logout -->
+      <div class="relative cursor-pointer" id="btn-logout-trigger">
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xs" id="user-avatar-initial">T</div>
+      </div>
     </header>
 
-    <div class="flex-grow flex flex-col md:flex-row max-w-7xl mx-auto w-full">
-        <!-- 사이드바 (PC에서는 좌측, 모바일/태블릿에서는 하단 네비게이션 형태이나, 마크업 구조상 분리) -->
-        <!-- 여기서는 반응형 구조를 고려하여 PC 사이드바와 하단 네비를 위한 컨테이너 정의 -->
-        <aside
-            class="hidden lg:block w-64 flex-shrink-0 bg-white border-r border-slate-200 min-h-[calc(100vh-4rem)] p-4">
-            <nav class="space-y-1">
-                <a href="#"
-                    class="bg-sky-50 text-primary group flex items-center px-3 py-2 text-sm font-medium rounded-md"
-                    aria-current="page">
-                    <svg class="text-primary mr-3 flex-shrink-0 h-6 w-6" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                        </path>
-                    </svg>
-                    <span class="truncate">학생 보기</span>
-                </a>
-                <a href="#"
-                    class="text-slate-600 hover:bg-slate-50 hover:text-slate-900 group flex items-center px-3 py-2 text-sm font-medium rounded-md">
-                    <svg class="text-slate-400 group-hover:text-slate-500 mr-3 flex-shrink-0 h-6 w-6" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                        </path>
-                    </svg>
-                    <span class="truncate">통계 / 분석</span>
-                </a>
-                <a href="#"
-                    class="text-slate-600 hover:bg-slate-50 hover:text-slate-900 group flex items-center px-3 py-2 text-sm font-medium rounded-md">
-                    <svg class="text-slate-400 group-hover:text-slate-500 mr-3 flex-shrink-0 h-6 w-6" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                        </path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <span class="truncate">설정</span>
-                </a>
-                <button type="button" onclick="openInitialCheckModal()"
-                    class="w-full text-slate-600 hover:bg-slate-50 hover:text-slate-900 group flex items-center px-3 py-2 text-sm font-medium rounded-md mt-4 border border-slate-200 transition-colors">
-                    <svg class="text-slate-400 group-hover:text-primary mr-3 flex-shrink-0 h-6 w-6" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
-                        </path>
-                    </svg>
-                    <span class="truncate">학기초 조사</span>
-                </button>
-            </nav>
-        </aside>
-
-        <!-- 메인 콘텐츠 영역 -->
-        <main class="flex-1 p-4 sm:p-6 lg:p-8" id="main-content">
-            <!-- 로그인 전 화면 예시 (기본은 숨김 처리) -->
-            <div id="login-view" class="hidden flex flex-col items-center justify-center h-full min-h-[50vh]">
-                <svg class="w-16 h-16 text-primary mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-                    </path>
-                </svg>
-                <h2 class="text-2xl font-bold text-slate-900 mb-2">학급 관찰 일지 시스템</h2>
-                <p class="text-slate-600 mb-8 text-center max-w-md">선생님의 수업 직후 1~2분 관찰 기록이 아이들의 성장을 돕습니다.<br>학생들의 태그와
-                    메모를 간편하게 관리하세요.</p>
-                <button id="btn-login-main"
-                    class="btn-ripple flex items-center justify-center px-4 py-2 border border-[#dadce0] text-sm rounded text-[#3c4043] bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 shadow-sm transition-colors"
-                    style="font-family: 'Roboto', sans-serif; font-weight: 500;">
-                    <!-- Google SVG Logo -->
-                    <svg class="w-5 h-5 mr-3" viewBox="0 0 48 48">
-                        <path fill="#EA4335"
-                            d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z">
-                        </path>
-                        <path fill="#4285F4"
-                            d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z">
-                        </path>
-                        <path fill="#FBBC05"
-                            d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z">
-                        </path>
-                        <path fill="#34A853"
-                            d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z">
-                        </path>
-                        <path fill="none" d="M0 0h48v48H0z"></path>
-                    </svg>
-                    Google 계정으로 로그인
-                </button>
-            </div>
-
-            <!-- 로그인 후 메인 (학생 목록 뷰) 예시 (기본 표시) -->
-            <div id="dashboard-view" class="block fade-in">
-                <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <!-- 검색창 -->
-                    <div class="relative w-full sm:w-72">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </div>
-                        <input type="text" id="search-student"
-                            class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-colors"
-                            placeholder="학생 이름 검색">
-                    </div>
-                    <!-- 필터 버튼 -->
-                    <div class="flex flex-wrap gap-2 text-sm">
-                        <button
-                            class="px-3 py-1.5 rounded-full bg-slate-900 text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 filter-btn"
-                            data-filter="all">전체 (0)</button>
-                        <button
-                            class="px-3 py-1.5 rounded-full bg-white text-slate-700 border border-slate-300 font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary filter-btn transition-colors"
-                            data-filter="completed">성향완료 (0)</button>
-                        <button
-                            class="px-3 py-1.5 rounded-full bg-white text-amber-700 border border-amber-200 font-medium hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 filter-btn transition-colors"
-                            data-filter="warning">주의필요 (0)</button>
-                    </div>
-                </div>
-
-                <!-- 학생 카드 그리드 -->
-                <div id="student-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-10 text-slate-500">
-                        데이터를 불러오는 중입니다...
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- 하단 네비게이션 (모바일 전용) -->
-    <nav class="lg:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 z-40 pb-safe">
-        <div class="flex justify-around">
-            <a href="#" class="flex flex-col items-center py-2 px-3 text-primary">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                    </path>
-                </svg>
-                <span class="text-xs mt-1 font-medium">학생</span>
-            </a>
-            <a href="#" class="flex flex-col items-center py-2 px-3 text-slate-500 hover:text-slate-900">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                    </path>
-                </svg>
-                <span class="text-xs mt-1 font-medium">통계</span>
-            </a>
-            <a href="#" class="flex flex-col items-center py-2 px-3 text-slate-500 hover:text-slate-900">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                    </path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <span class="text-xs mt-1 font-medium">설정</span>
-            </a>
+    <!-- Content (Student Grid) -->
+    <main class="flex-1 overflow-y-auto p-5 pb-32">
+      <div id="student-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <!-- Students will be injected here -->
+      <!-- Home Tab -->
+      <div id="home-tab" class="px-4 transition-opacity">
+        <div id="student-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+          <!-- JS rendered grid -->
         </div>
+        
+        <!-- Wizard Trigger FAB -->
+        <button id="btn-fab-wizard" class="fixed right-6 bottom-24 w-14 h-14 bg-primary text-white rounded-full shadow-[0_4px_12px_rgba(3,98,66,0.4)] flex items-center justify-center hover:bg-primaryHover active:scale-95 transition-transform z-20" aria-label="연속 관찰 마법사 열기">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Stats Dashbaord Tab -->
+      <div id="stats-tab" class="hide px-4 mt-6 fade-in">
+        <div class="bg-surface rounded-xl shadow-sm border border-borderDiv p-5 font-sans">
+          <h3 class="text-base font-bold text-textPrimary mb-4">현재 학급 성향 분포</h3>
+          <div class="relative w-full h-56 flex justify-center">
+            <canvas id="class-chart"></canvas>
+          </div>
+        </div>
+        <div class="mt-4 bg-surface rounded-xl shadow-sm border border-borderDiv p-5">
+          <h3 class="text-base font-bold text-red-600 flex items-center">
+            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            요주의 학생 (상담 권장)
+          </h3>
+          <ul id="warning-list" class="mt-3 divide-y divide-gray-100/60">
+             <!-- warning list generated by JS -->
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 w-full bg-surface border-t border-borderDiv flex justify-around items-center h-16 z-20 pb-safe">
+      <div id="nav-home" class="flex flex-col items-center justify-center text-primary w-full h-full cursor-pointer transition-colors active:bg-gray-50">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" /><path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" /></svg>
+        <span class="text-[11px] mt-1 font-medium">홈</span>
+      </div>
+      <div id="nav-stats" class="flex flex-col items-center justify-center text-textSecondary w-full h-full cursor-pointer transition-colors active:bg-gray-50">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+        <span class="text-[11px] mt-1 font-medium">통계 조회</span>
+      </div>
     </nav>
+  </div>
 
-    <!-- 우측 하단 플로팅 버튼 (성향 체크) -->
-    <button
-        class="fixed right-4 bottom-20 lg:bottom-8 z-50 bg-primary hover:bg-primary-hover text-white rounded-full p-4 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary btn-ripple transform transition-transform"
-        aria-label="학기초 성향 체크">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
-            </path>
-        </svg>
-    </button>
+  <!-- ============================================== -->
+  <!-- 2. Bottom Sheet Modal (Scenario A)               -->
+  <!-- ============================================== -->
+  <div id="backdrop" class="fixed inset-0 bg-black/40 z-30 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
 
-    <!-- 모달 백드롭 (공통) -->
-    <div id="modal-backdrop" class="fixed inset-0 bg-slate-900 bg-opacity-50 z-50 hidden transition-opacity"></div>
-
-    <!-- 태그 찍기 모달 -->
-    <div id="tag-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex min-h-screen items-center justify-center px-4 pt-4 pb-20 text-center sm:p-0">
-            <div
-                class="relative bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start w-full">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4" id="tag-modal-title">태그 찍기
-                            </h3>
-                            <input type="hidden" id="tag-target-student-id">
-
-                            <!-- 성격 카테고리 -->
-                            <div class="mb-4">
-                                <h4 class="text-sm font-medium text-slate-500 mb-2">성격</h4>
-                                <div class="flex flex-wrap gap-2" id="tag-group-personality">
-                                    <button
-                                        class="tag-btn px-3 py-1 border border-sky-200 bg-sky-50 text-sky-700 rounded-full text-sm hover:bg-sky-100 transition-colors"
-                                        data-category="personality" data-label="외향적" data-warning="">외향적</button>
-                                    <button
-                                        class="tag-btn px-3 py-1 border border-sky-200 bg-sky-50 text-sky-700 rounded-full text-sm hover:bg-sky-100 transition-colors"
-                                        data-category="personality" data-label="내향적" data-warning="">내향적</button>
-                                    <button
-                                        class="tag-btn px-3 py-1 border border-sky-200 bg-sky-50 text-sky-700 rounded-full text-sm hover:bg-sky-100 transition-colors"
-                                        data-category="personality" data-label="리더십" data-warning="">리더십</button>
-                                </div>
-                            </div>
-
-                            <!-- 학습태도 카테고리 -->
-                            <div class="mb-4">
-                                <h4 class="text-sm font-medium text-slate-500 mb-2">학습태도</h4>
-                                <div class="flex flex-wrap gap-2" id="tag-group-learning">
-                                    <button
-                                        class="tag-btn px-3 py-1 border border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full text-sm hover:bg-indigo-100 transition-colors"
-                                        data-category="learning" data-label="발표선호" data-warning="">발표선호</button>
-                                    <button
-                                        class="tag-btn px-3 py-1 border border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full text-sm hover:bg-indigo-100 transition-colors"
-                                        data-category="learning" data-label="경청함" data-warning="">경청함</button>
-                                    <button
-                                        class="tag-btn px-3 py-1 border border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full text-sm hover:bg-indigo-100 transition-colors"
-                                        data-category="learning" data-label="집중력좋음" data-warning="">집중력좋음</button>
-                                </div>
-                            </div>
-
-                            <!-- 생활습관 카테고리 -->
-                            <div class="mb-4">
-                                <h4 class="text-sm font-medium text-slate-500 mb-2">생활습관</h4>
-                                <div class="flex flex-wrap gap-2" id="tag-group-behavior">
-                                    <button
-                                        class="tag-btn px-3 py-1 border border-green-200 bg-green-50 text-green-700 rounded-full text-sm hover:bg-green-100 transition-colors"
-                                        data-category="behavior" data-label="정리정돈수행" data-warning="">정리정돈수행</button>
-                                    <button
-                                        class="tag-btn px-3 py-1 border border-amber-200 bg-amber-50 text-amber-700 rounded-full text-sm hover:bg-amber-100 transition-colors"
-                                        data-category="behavior" data-label="산만함" data-warning="caution">산만함</button>
-                                    <button
-                                        class="tag-btn px-3 py-1 border border-red-200 bg-red-50 text-red-700 rounded-full text-sm hover:bg-red-100 transition-colors"
-                                        data-category="behavior" data-label="규칙위반" data-warning="alert">규칙위반</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- 버튼 영역 -->
-                <div class="bg-slate-50 px-4 py-3 sm:px-6 flex flex-row-reverse gap-2 border-t border-slate-200">
-                    <button type="button" id="btn-save-tag"
-                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary-hover sm:w-auto sm:text-sm transition-colors isLoading">
-                        <span>저장하기</span>
-                    </button>
-                    <button type="button" onclick="closeTagModal()"
-                        class="w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 sm:w-auto sm:text-sm transition-colors">
-                        취소
-                    </button>
-                </div>
-            </div>
+  <div id="bottom-sheet" class="fixed inset-x-0 bottom-0 bg-surface rounded-t-2xl shadow-xl z-40 transform translate-y-full transition-transform duration-300 flex flex-col max-h-[85vh]">
+    <div class="px-5 py-4 border-b border-borderDiv flex justify-between items-center bg-surface rounded-t-2xl sticky top-0">
+      <h2 id="bs-student-name" class="text-xl font-bold text-textPrimary">학생 태그 추가</h2>
+      <button id="btn-close-bs" class="p-2 -mr-2 text-textSecondary active:bg-gray-100 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    
+    <div class="p-5 flex-1 overflow-y-auto">
+      <h3 class="text-sm font-medium text-textSecondary mb-3">관찰 태그 (다중 선택)</h3>
+      <div id="chip-container" class="flex flex-wrap gap-2">
+        <!-- JS rendered chips -->
+      </div>
+      
+      <div class="mt-8 border-t border-borderDiv pt-4">
+        <button id="btn-toggle-memo" class="text-primary font-medium text-sm flex items-center mb-2 active:bg-gray-50 px-2 py-1 -ml-2 rounded w-max">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          상세 메모 추가 (선택)
+        </button>
+        <div id="memo-container" class="hide flex flex-col gap-2 mt-2">
+          <textarea id="memo-input" class="w-full border border-borderDiv rounded-lg p-3 text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent min-h-[100px]" placeholder="구체적인 관찰 내용을 입력하세요..."></textarea>
+          <div class="flex gap-2 overflow-x-auto pb-2 flex-nowrap hide-scrollbar">
+            <button class="preset-chip shrink-0 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200 active:bg-gray-200">개념 이해가 빠름</button>
+            <button class="preset-chip shrink-0 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200 active:bg-gray-200">주변 친구들을 잘 도와줌</button>
+            <button class="preset-chip shrink-0 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200 active:bg-gray-200">어려운 문제도 끝까지 시도함</button>
+          </div>
         </div>
+      </div>
     </div>
 
-    <!-- 메모 모달 -->
-    <div id="memo-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex min-h-screen items-center justify-center px-4 pt-4 pb-20 text-center sm:p-0">
-            <div
-                class="relative bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start w-full">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4" id="memo-modal-title">관찰 메모
-                                남기기</h3>
-                            <input type="hidden" id="memo-target-student-id">
-
-                            <!-- 빠른 서식 템플릿 -->
-                            <div class="mb-4 flex flex-wrap gap-2">
-                                <button
-                                    class="memo-template-btn px-3 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-lg hover:bg-slate-200"
-                                    data-text="수업에 집중하고 활발히 참여함">수업집중</button>
-                                <button
-                                    class="memo-template-btn px-3 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-lg hover:bg-slate-200"
-                                    data-text="친구와 갈등이 있었으나 잘 해결함">관계개선</button>
-                                <button
-                                    class="memo-template-btn px-3 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-lg hover:bg-slate-200"
-                                    data-text="과제 제출이 미흡하여 지도함">과제미흡</button>
-                            </div>
-
-                            <!-- 메모 입력창 -->
-                            <div>
-                                <textarea id="memo-textarea" rows="4"
-                                    class="block w-full rounded-md border-slate-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-3 resize-none"
-                                    placeholder="학생 관찰 내용을 입력해주세요..." required></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- 버튼 영역 -->
-                <div class="bg-slate-50 px-4 py-3 sm:px-6 flex flex-row-reverse gap-2 border-t border-slate-200">
-                    <button type="button" id="btn-save-memo"
-                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary-hover sm:w-auto sm:text-sm transition-colors">
-                        저장하기
-                    </button>
-                    <button type="button" onclick="closeMemoModal()"
-                        class="w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 sm:w-auto sm:text-sm transition-colors">
-                        취소
-                    </button>
-                </div>
-            </div>
-        </div>
+    <div class="p-4 border-t border-borderDiv bg-surface pb-safe">
+      <button id="btn-save-bs" class="w-full h-14 bg-primary text-white font-medium text-lg rounded-lg shadow active:scale-[0.98] transition-transform flex items-center justify-center">
+        저장
+      </button>
     </div>
+  </div>
 
-    <!-- 학기 초 성향 체크 모달 -->
-    <div id="initial-check-modal" class="fixed inset-0 z-[60] hidden overflow-y-auto"
-        aria-labelledby="initial-check-modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div
-                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-slate-900" id="initial-check-modal-title">
-                                학기 초 성향 체크
-                            </h3>
-                            <div class="mt-2" id="initial-check-content">
-                                <p class="text-sm text-slate-500 mb-4">아직 기초 성향 조사를 완료하지 않은 학생들의 특성을 기록합니다.</p>
-
-                                <div id="ic-no-more-students" class="hidden text-center py-8 text-slate-500">
-                                    모든 학생의 조사가 완료되었습니다.
-                                </div>
-
-                                <div id="ic-student-form-wrap">
-                                    <div class="mb-4 bg-slate-50 p-4 rounded-md flex items-center gap-4">
-                                        <div class="w-12 h-12 rounded-full bg-white flex justify-center items-center shadow-sm border border-slate-200 text-lg font-bold text-slate-700"
-                                            id="ic-number">1</div>
-                                        <div>
-                                            <div class="font-bold text-lg" id="ic-name">이름</div>
-                                            <div class="text-sm text-slate-500" id="ic-gender">남/여</div>
-                                        </div>
-                                        <input type="hidden" id="ic-student-id">
-                                    </div>
-
-                                    <!-- 체크박스 영역 -->
-                                    <div class="mb-4">
-                                        <h4 class="text-sm font-medium text-slate-700 mb-2">기초 관찰 성향 (다중 확인 가능)</h4>
-                                        <div class="grid grid-cols-2 gap-2" id="ic-checkboxes">
-                                            <label
-                                                class="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer p-2 hover:bg-slate-50 rounded border border-slate-100">
-                                                <input type="checkbox" value="활발함"
-                                                    class="ic-check rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4">
-                                                <span>활발함</span>
-                                            </label>
-                                            <label
-                                                class="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer p-2 hover:bg-slate-50 rounded border border-slate-100">
-                                                <input type="checkbox" value="차분함"
-                                                    class="ic-check rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4">
-                                                <span>차분함</span>
-                                            </label>
-                                            <label
-                                                class="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer p-2 hover:bg-slate-50 rounded border border-slate-100">
-                                                <input type="checkbox" value="리더십"
-                                                    class="ic-check rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4">
-                                                <span>리더십 있음</span>
-                                            </label>
-                                            <label
-                                                class="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer p-2 hover:bg-slate-50 rounded border border-slate-100">
-                                                <input type="checkbox" value="주의산만"
-                                                    class="ic-check rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4">
-                                                <span>다소 산만한 편</span>
-                                            </label>
-                                            <label
-                                                class="flex items-center space-x-2 text-sm text-slate-700 cursor-pointer p-2 hover:bg-slate-50 rounded border border-slate-100">
-                                                <input type="checkbox" value="도움필요"
-                                                    class="ic-check rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4">
-                                                <span>일부 도움 필요</span>
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <!-- 메모 영역 -->
-                                    <div>
-                                        <h4 class="text-sm font-medium text-slate-700 mb-2">첫인상 메모</h4>
-                                        <textarea id="ic-memo" rows="3"
-                                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 w-full sm:text-sm border-slate-300 rounded-md p-2 border resize-none"
-                                            placeholder="눈에 띄는 특성이나 기초 상담 내용을 적어주세요."></textarea>
-                                    </div>
-
-                                    <!-- 진행 상황 -->
-                                    <div class="mt-4 text-sm text-slate-500 text-right font-medium" id="ic-progress">
-                                        남은 대상: 0명
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- 버튼 영역 -->
-                <div class="bg-slate-50 px-4 py-3 sm:px-6 flex flex-row-reverse gap-2 border-t border-slate-200">
-                    <button type="button" id="btn-save-next-ic"
-                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:w-auto sm:text-sm transition-colors">
-                        저장 후 계속
-                    </button>
-                    <button type="button" onclick="closeInitialCheckModal()"
-                        class="w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 sm:w-auto sm:text-sm transition-colors">
-                        닫기
-                    </button>
-                </div>
-            </div>
+  <!-- ============================================== -->
+  <!-- 3. Wizard Modal (Scenario B)                     -->
+  <!-- ============================================== -->
+  <div id="wizard-modal" class="fixed inset-0 bg-surface z-50 transform translate-y-full transition-transform duration-300 pointer-events-none flex flex-col">
+    <!-- Wizard Header -->
+    <div class="px-3 py-3 border-b border-borderDiv bg-surface flex items-center pt-safe shadow-sm">
+      <button id="btn-close-wizard" class="p-2 text-textSecondary active:bg-gray-100 rounded-full">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+      <div class="flex-1 mx-4 relative">
+        <div class="h-2 bg-gray-100 border border-gray-200 rounded-full overflow-hidden">
+          <div id="wizard-progress" class="h-full bg-primary transition-all duration-300 relative" style="width: 0%">
+             <div class="absolute right-0 top-0 bottom-0 w-5 bg-white opacity-20"></div>
+          </div>
         </div>
+      </div>
+      <span id="wizard-counter" class="text-xs font-semibold text-textSecondary min-w-[32px] text-right">0/0</span>
     </div>
+    
+    <!-- Wizard Body -->
+    <div class="flex-1 flex flex-col items-center justify-center p-6 text-center overflow-hidden relative">
+       <!-- Background decoration element -->
+       <div class="absolute opacity-5 -top-10 -right-10 w-64 h-64 bg-primary rounded-full filter blur-3xl pointer-events-none"></div>
 
-    <!-- 스크립트 분리: 앱 로직 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, orderBy, getDocs, addDoc, updateDoc, doc, setDoc, getDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+      <div class="bg-gray-50 border border-dashed border-gray-300 text-gray-500 rounded-lg px-3 py-1 text-xs font-medium mb-4">
+         최근 평가가 누락된 학생
+      </div>
+      <h1 id="wizard-student-name" class="text-[40px] font-extrabold text-textPrimary tracking-tight mb-8">안지정</h1>
+      
+      <!-- Quick Tags for Wizard -->
+      <div class="grid grid-cols-2 gap-4 w-full max-w-[340px]">
+        <button class="wizard-btn-tag py-6 flex flex-col items-center justify-center bg-white shadow border border-gray-100 rounded-2xl active:bg-indigo-50 active:scale-[0.98] transition-all" data-tag="t2" aria-label="집중 우수">
+           <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-2 shadow-inner">
+             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+           </div>
+           <span class="text-base font-bold text-gray-800">집중 우수</span>
+        </button>
+        <button class="wizard-btn-tag py-6 flex flex-col items-center justify-center bg-white shadow border border-gray-100 rounded-2xl active:bg-amber-50 active:scale-[0.98] transition-all" data-tag="t4" aria-label="산만함">
+           <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-2 shadow-inner">
+             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+           </div>
+           <span class="text-base font-bold text-gray-800">산만함</span>
+        </button>
+        <button class="wizard-btn-tag py-4 flex flex-col justify-center items-center bg-white shadow border border-gray-100 rounded-2xl active:bg-sky-50 active:scale-[0.98] transition-all col-span-2" data-tag="t1">
+           <div class="flex items-center text-sky-600 gap-2">
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+             <span class="text-base font-bold text-gray-800">특이사항 없음 (외향/밝음)</span>
+           </div>
+        </button>
+      </div>
+    </div>
+    
+    <div class="p-6 pb-safe bg-surface flex justify-center sticky bottom-0">
+      <button id="btn-wizard-skip" class="w-full max-w-[340px] h-14 border border-gray-300 text-gray-600 font-medium active:bg-gray-100 transition-colors rounded-xl flex items-center justify-center relative shadow-sm">
+        <span class="absolute left-6">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </span>
+        지금은 평가 건너뛰기
+      </button>
+    </div>
+  </div>
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCr_D0Qk-o6-Hw42YZmYpXZiDViuD-No1k",
-            authDomain: "teacher-log-teaju-2026.firebaseapp.com",
-            projectId: "teacher-log-teaju-2026",
-            storageBucket: "teacher-log-teaju-2026.firebasestorage.app",
-            messagingSenderId: "229156278607",
-            appId: "1:229156278607:web:90a74203272532a997753a"
-        };
+  <!-- Toast Message Box -->
+  <div id="toast-container" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center space-y-2 pointer-events-none"></div>
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
+  <!-- ============================================== -->
+  <!-- Firebase & Application Logic                   -->
+  <!-- ============================================== -->
+  <!-- Google Identity Services (GIS) API -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <script type="module">
+    //==========================================
+    // 1. Firebase Initializing
+    //==========================================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, runTransaction, serverTimestamp, query, where, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-        window.auth = auth;
-        window.db = db;
+    // Firebase 웹 앱 설정 (선생님 발급 키 적용 완료)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCr_D0Qk-o6-Hw42YZmYpXZiDViuD-No1k",
+      authDomain: "teacher-log-teaju-2026.firebaseapp.com",
+      projectId: "teacher-log-teaju-2026",
+      storageBucket: "teacher-log-teaju-2026.firebasestorage.app",
+      messagingSenderId: "229156278607",
+      appId: "1:229156278607:web:90a74203272532a997753a"
+    };
 
-        let currentUser = null;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
 
-        const loginView = document.getElementById('login-view');
-        const dashboardView = document.getElementById('dashboard-view');
-        const btnLoginMain = document.getElementById('btn-login-main');
-        const headerAuthSection = document.getElementById('header-auth-section');
+    //==========================================
+    // 2. Global State & Data Definitions
+    //==========================================
+    const state = {
+      user: null,
+      students: [], // db mock
+      activeStudentId: null,
+      selectedTags: new Set(),
+      // Wizard Properties
+      wizardQueue: [],
+      wizardCurrentIndex: 0,
+    };
 
-        // ==== 인증 상태 모니터링 ====
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // 로그인 성공 시
-                currentUser = user;
-                loginView.classList.add('hidden');
-                dashboardView.classList.remove('hidden');
+    const TAG_CATEGORIES = {
+      '긍정': { bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-300' },
+      '학습': { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-300' },
+      '생활': { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-300' },
+      '주의': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-300' },
+      '경고': { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-300' },
+    };
 
-                // 상단 헤더 UI 업데이트
-                headerAuthSection.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm font-medium text-slate-700">${user.displayName} 선생님</span>
-                        <button id="btn-logout" class="text-sm text-slate-500 hover:text-slate-700 transition-colors">로그아웃</button>
-                    </div>
-                `;
-                document.getElementById('btn-logout').addEventListener('click', () => {
-                    signOut(auth);
-                });
+    const TAGS = [
+      { id: 't1', label: '외향적', cat: '긍정' },
+      { id: 't2', label: '집중 우수', cat: '학습' },
+      { id: 't3', label: '정리 정돈 잘함', cat: '생활' },
+      { id: 't4', label: '산만함', cat: '주의' },
+      { id: 't5', label: '지각', cat: '주의' },
+      { id: 't6', label: '친구와 갈등', cat: '경고' },
+    ];
 
-                // users 컬렉션에 사용자 정보 저장(없을 경우)
-                try {
-                    const userRef = doc(db, 'users', user.uid);
-                    const userSnap = await getDoc(userRef);
-                    if (!userSnap.exists()) {
-                        await setDoc(userRef, {
-                            email: user.email,
-                            name: user.displayName,
-                            school: "",
-                            createdAt: serverTimestamp()
-                        });
-                    }
-                } catch (error) {
-                    console.error("사용자 정보 저장/조회 실패:", error);
-                }
+    //==========================================
+    // 3. View Logic & DOM Bindings
+    //==========================================
+    const DOM = {
+      login: document.getElementById('login-view'),
+      app: document.getElementById('app-view'),
+      btnLogout: document.getElementById('btn-logout-trigger'),
+      grid: document.getElementById('student-grid'),
+      toast: document.getElementById('toast-container'),
+      avatarInit: document.getElementById('user-avatar-initial'),
+      googleBtnContainer: document.getElementById('google-btn-container'),
+      
+      // Navigation Tabs
+      navHome: document.getElementById('nav-home'),
+      navStats: document.getElementById('nav-stats'),
+      homeTab: document.getElementById('home-tab'),
+      statsTab: document.getElementById('stats-tab'),
+      
+      // Bottom Sheet DOMs
+      backdrop: document.getElementById('backdrop'),
+      bottomSheet: document.getElementById('bottom-sheet'),
+      bsStudentName: document.getElementById('bs-student-name'),
+      btnCloseBs: document.getElementById('btn-close-bs'),
+      btnSaveBs: document.getElementById('btn-save-bs'),
+      chipContainer: document.getElementById('chip-container'),
+      btnToggleMemo: document.getElementById('btn-toggle-memo'),
+      memoContainer: document.getElementById('memo-container'),
+      memoInput: document.getElementById('memo-input'),
+      
+      // Wizard DOMs
+      btnFabWizard: document.getElementById('btn-fab-wizard'),
+      wizardModal: document.getElementById('wizard-modal'),
+      btnCloseWizard: document.getElementById('btn-close-wizard'),
+      wizardProgress: document.getElementById('wizard-progress'),
+      wizardCounter: document.getElementById('wizard-counter'),
+      wizardStudentName: document.getElementById('wizard-student-name'),
+      btnWizardSkip: document.getElementById('btn-wizard-skip'),
+      classChart: document.getElementById('class-chart') ? document.getElementById('class-chart').getContext('2d') : null,
+      warningList: document.getElementById('warning-list'),
+    };
 
-                loadInitialData();
-            } else {
-                // 로그아웃 상태
-                currentUser = null;
-                loginView.classList.remove('hidden');
-                dashboardView.classList.add('hidden');
-                headerAuthSection.innerHTML = '';
-            }
+    const showToast = (message, type = 'success') => {
+      const el = document.createElement('div');
+      const isError = type === 'error';
+      el.className = `px-4 py-3 rounded-lg shadow-lg text-sm font-medium text-white transition-opacity duration-300 ${isError ? 'bg-red-600' : 'bg-gray-800'}`;
+      el.textContent = message;
+      DOM.toast.appendChild(el);
+      
+      setTimeout(() => { el.style.opacity = '0'; }, 2000);
+      setTimeout(() => { if(el.parentNode) el.remove(); }, 2300);
+    };
+
+    const toggleView = (isLoggedIn) => {
+      if(isLoggedIn) {
+        DOM.login.classList.add('hide');
+        DOM.app.classList.remove('hide');
+      } else {
+        DOM.login.classList.remove('hide');
+        DOM.app.classList.add('hide');
+      }
+    };
+
+    const renderStudents = () => {
+      DOM.grid.innerHTML = state.students.map(s => `
+        <div class="bg-white border border-borderDiv rounded-lg p-4 shadow-sm flex flex-col items-center relative transition-transform">
+          <div class="text-lg font-semibold text-textPrimary">${s.name}</div>
+          <div class="text-xs text-textSecondary mt-1">${s.studentNo}번</div>
+          ${s.warningTagCount > 0 ? `<div class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-100 text-red-600 text-[10px] font-bold flex items-center justify-center border border-white font-sans">${s.warningTagCount}</div>` : ''}
+          <button class="mt-4 w-full py-2 px-3 bg-gray-50 border border-borderDiv rounded-lg text-sm font-medium text-textSecondary active:bg-gray-100 transition-colors btn-open-bs" data-id="${s.id}" data-name="${s.name}">
+            태그 찍기
+          </button>
+        </div>
+      `).join('');
+      
+      // Bottom Sheet 트리거 이벤트 바인딩
+      document.querySelectorAll('.btn-open-bs').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          openBottomSheet(e.currentTarget.dataset.id, e.currentTarget.dataset.name);
         });
+      });
+    };
 
-        // ==== 구글 로그인 ====
-        btnLoginMain.addEventListener('click', async () => {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                if (error.code !== 'auth/popup-closed-by-user') {
-                    console.error("로그인 실패:", error);
-                    alert("로그인에 실패했습니다. 다시 시도해주세요.");
-                }
-            }
+    //==========================================
+    // 3.1 Bottom Sheet Logic (Scenario A)
+    //==========================================
+    const renderChips = () => {
+      DOM.chipContainer.innerHTML = TAGS.map(tag => {
+        const isSelected = state.selectedTags.has(tag.id);
+        const color = TAG_CATEGORIES[tag.cat];
+        // 48px 이상 터치 영역 및 상태별 컬러 분기 (선택 시 굵고 진하게)
+        const classStr = isSelected 
+          ? `${color.bg} ${color.text} ${color.border} active:scale-95 border-2 min-h-[48px] font-semibold opacity-100 shadow-sm` 
+          : `bg-white text-slate-600 border-slate-300 active:bg-slate-50 active:scale-95 min-h-[48px] font-medium opacity-90 border border-dashed`;
+
+        return `<button class="chip px-4 py-2 rounded-full flex justify-center items-center transition-all ${classStr}" data-id="${tag.id}">
+            ${tag.label}
+          </button>`;
+      }).join('');
+
+      // 칩 토글 이벤트 바인딩
+      document.querySelectorAll('.chip').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.dataset.id;
+          state.selectedTags.has(id) ? state.selectedTags.delete(id) : state.selectedTags.add(id);
+          renderChips(); // 낙관적 칩 렌더링
         });
+      });
+    };
 
-        // 전역 상태 변수
-        let currentClassId = null;
-        let studentsData = [];
-        let tagsData = [];
-        let obsData = [];
+    const openBottomSheet = (studentId, studentName) => {
+      state.activeStudentId = studentId;
+      state.selectedTags.clear();
+      DOM.bsStudentName.textContent = `${studentName} 관찰 추가`;
+      DOM.memoInput.value = '';
+      DOM.memoContainer.classList.add('hide'); // 메모 닫아둠 (점진적 공개)
+      
+      renderChips(); // 렌더링 초기화
+      
+      // 슬라이딩 애니메이션 실행
+      DOM.backdrop.classList.remove('pointer-events-none', 'opacity-0');
+      DOM.backdrop.classList.add('opacity-100');
+      DOM.bottomSheet.classList.remove('translate-y-full');
+      DOM.bottomSheet.classList.add('translate-y-0');
+    };
 
-        // ==== 초기 데이터 로드 ====
-        async function loadInitialData() {
-            try {
-                // 1. 학급 조회
-                const classesQ = query(collection(db, 'classes'), where('teacherId', '==', currentUser.uid));
-                const classSnap = await getDocs(classesQ);
+    const closeBottomSheet = () => {
+      state.activeStudentId = null;
+      DOM.backdrop.classList.add('pointer-events-none', 'opacity-0');
+      DOM.backdrop.classList.remove('opacity-100');
+      DOM.bottomSheet.classList.add('translate-y-full');
+      DOM.bottomSheet.classList.remove('translate-y-0');
+    };
 
-                if (classSnap.empty) {
-                    await setupMockData();
-                } else {
-                    currentClassId = classSnap.docs[0].id;
-                }
+    // Bottom Sheet Event Listeners
+    DOM.btnCloseBs.addEventListener('click', closeBottomSheet);
+    DOM.backdrop.addEventListener('click', closeBottomSheet);
+    
+    // 메모 아코디언 토글
+    DOM.btnToggleMemo.addEventListener('click', () => {
+      DOM.memoContainer.classList.toggle('hide');
+    });
 
-                // 2. 학생, 태그, 관찰 기록 조회
-                const studentsQ = query(collection(db, 'students'), where('classId', '==', currentClassId), orderBy('number', 'asc'));
+    // 상용구 칩 클릭 시 Textarea에 자동 삽입
+    document.querySelectorAll('.preset-chip').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const text = e.currentTarget.textContent;
+        // 문장 이어붙이기
+        DOM.memoInput.value += (DOM.memoInput.value ? " " : "") + text;
+      });
+    });
 
-                const [studentsSnap, tagsSnap, obsSnap] = await Promise.all([
-                    getDocs(studentsQ),
-                    // 태그와 관찰 기록도 classId를 기준으로 가져오는 것이 이상적이지만, 
-                    // 현재는 데모/MVP 목적으로 전체를 가져와서 필터링 (향후 인덱스 및 구조 개선 필요)
-                    getDocs(collection(db, 'tags')),
-                    getDocs(collection(db, 'observations'))
-                ]);
+    //==========================================
+    // 3.2 낙관적 UI 업데이트 및 롤백 로직 (Save)
+    //==========================================
+    DOM.btnSaveBs.addEventListener('click', async () => {
+      if(state.selectedTags.size === 0 && DOM.memoInput.value.trim() === '') {
+        showToast('최소 1개의 태그 또는 메모를 작성해 주세요.', 'error');
+        return;
+      }
+      
+      const stIndex = state.students.findIndex(s => s.id === state.activeStudentId);
+      if(stIndex === -1) return;
 
-                studentsData = studentsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                // 본인 학급의 학생 데이터와 관련된 태그, 관찰 기록만 메모리에서 필터링
-                const studentIds = studentsData.map(s => s.id);
-                tagsData = tagsSnap.docs.map(d => ({ id: d.id, ...d.data() })).filter(t => studentIds.includes(t.studentId));
-                obsData = obsSnap.docs.map(d => ({ id: d.id, ...d.data() })).filter(o => studentIds.includes(o.studentId));
+      // 1. Rollback용 데이터 백업 깊은 복사
+      const prevStudentState = JSON.parse(JSON.stringify(state.students[stIndex]));
+      
+      // 태그 연산
+      let warningDelta = 0; let positiveDelta = 0;
+      Array.from(state.selectedTags).forEach(id => {
+        const t = TAGS.find(x => x.id === id);
+        if(t.cat === '주의' || t.cat === '경고') warningDelta++;
+        if(t.cat === '긍정' || t.cat === '학습' || t.cat === '생활') positiveDelta++;
+      });
 
-                renderStudentGrid();
-            } catch (error) {
-                console.error("데이터 로드 실패:", error);
-                document.getElementById('student-grid').innerHTML = '<div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-10 text-red-500">데이터를 불러오는 데 실패했습니다.</div>';
-            }
+      // 2. Optimistic UI 선 반영 및 뷰 새로고침
+      state.students[stIndex].warningTagCount += warningDelta;
+      state.students[stIndex].positiveTagCount += positiveDelta;
+      
+      renderStudents();        // 화면 즉시 리렌더링
+      closeBottomSheet();      // 체감 지연 0초
+      showToast('성공적으로 저장되었습니다.'); 
+
+      // 3. 백그라운드 서버 전송 (실패 시 롤백 수행)
+      try {
+        // 실제 관찰 기록 추가 및 역정규화 카운트 트랜잭션 업데이트
+        const obsRef = collection(db, 'observations');
+        await addDoc(obsRef, {
+          teacherUid: state.user.uid,
+          studentId: state.activeStudentId,
+          tags: Array.from(state.selectedTags),
+          memo: DOM.memoInput.value.trim(),
+          createdAt: serverTimestamp()
+        });
+        
+        const stRef = doc(db, 'students', state.activeStudentId);
+        await runTransaction(db, async (transaction) => {
+          const docSnap = await transaction.get(stRef);
+          if(!docSnap.exists()) throw new Error("데이터 없음");
+          transaction.update(stRef, { 
+            warningTagCount: docSnap.data().warningTagCount + warningDelta, 
+            positiveTagCount: docSnap.data().positiveTagCount + positiveDelta 
+          });
+        });
+      } catch (error) {
+        // 에러 감지 -> 롤백 실행
+        console.error("Firebase Update Failed:", error);
+        state.students[stIndex] = prevStudentState; // 상태 원복
+        renderStudents(); // 강제 롤백 재렌더링
+        showToast('네트워크 오류입니다. 로컬 기록이 취소되었습니다.', 'error');
+      }
+    });
+
+    //==========================================
+    // 3.3 통계 조회 뷰 라우팅 로직 (Scenario C)
+    //==========================================
+    let classChartInstance = null;
+
+    const renderStats = () => {
+      // 1. 요주의 학생 명단 업데이트
+      const warnings = state.students.filter(s => s.warningTagCount > 0).sort((a,b) => b.warningTagCount - a.warningTagCount);
+      DOM.warningList.innerHTML = warnings.length > 0
+        ? warnings.map(s => `
+          <li class="py-3 flex justify-between items-center transition-colors">
+            <span class="font-medium text-textPrimary">${s.name} <span class="text-xs text-textSecondary ml-1">${s.studentNo}번</span></span> 
+            <span class="bg-red-50 text-red-600 text-xs px-2 py-1 rounded-full font-bold border border-red-100 flex items-center">
+              ${s.warningTagCount}회 누적
+              <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </span>
+          </li>`).join('')
+        : `<li class="py-10 text-center text-sm text-textSecondary font-medium flex flex-col items-center">
+             <svg class="w-10 h-10 mb-2 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+             현재 요주의 상담 대상 학생이 없습니다.
+           </li>`;
+
+      // 2. Chart.js 캔버스 렌더링
+      if(classChartInstance) classChartInstance.destroy();
+      if(!DOM.classChart || typeof Chart === 'undefined') return;
+
+      const posTotal = state.students.reduce((acc, s) => acc + s.positiveTagCount, 0);
+      const negTotal = state.students.reduce((acc, s) => acc + s.warningTagCount, 0);
+      
+      // 피드백 데이터가 전혀 없을 경우 더미 플레이스홀더 출력 처리
+      const hasData = posTotal > 0 || negTotal > 0;
+
+      classChartInstance = new Chart(DOM.classChart, {
+        type: 'doughnut',
+        data: {
+          labels: ['긍정/학습 (+)', '주의/경고 (-)'],
+          datasets: [{
+            data: hasData ? [posTotal, negTotal] : [1, 1], // 빈 깡통 레이아웃
+            backgroundColor: hasData ? ['#059669', '#EF4444'] : ['#E2E8F0', '#E2E8F0'],
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Noto Sans KR', sans-serif" } } }
+          }
         }
+      });
+    };
 
-        async function setupMockData() {
-            console.log("학급 데이터가 없어 모의 데이터를 생성합니다...");
-            const classRef = await addDoc(collection(db, 'classes'), {
-                teacherId: currentUser.uid,
-                year: new Date().getFullYear(),
-                grade: 1,
-                classNumber: 1,
-                studentCount: 3,
-                createdAt: serverTimestamp()
+    DOM.navHome.addEventListener('click', () => {
+       DOM.homeTab.classList.remove('hide');
+       DOM.statsTab.classList.add('hide');
+       DOM.navHome.classList.replace('text-textSecondary', 'text-primary');
+       DOM.navStats.classList.replace('text-primary', 'text-textSecondary');
+    });
+
+    DOM.navStats.addEventListener('click', () => {
+       DOM.homeTab.classList.add('hide');
+       DOM.statsTab.classList.remove('hide');
+       DOM.navStats.classList.replace('text-textSecondary', 'text-primary');
+       DOM.navHome.classList.replace('text-primary', 'text-textSecondary');
+       renderStats(); // 탭 이동 시 렌더링
+    });
+
+    //==========================================
+    // 3.4 마법사 뷰 (Scenario B)
+    //==========================================
+    const renderWizardStep = () => {
+      const queue = state.wizardQueue;
+      const currentIdx = state.wizardCurrentIndex;
+      
+      if(currentIdx >= queue.length) {
+        closeWizard();
+        showToast(`총 ${queue.length}명의 관찰 일지 검토가 완료되었습니다 🎉`);
+        renderStudents();
+        return;
+      }
+      
+      const st = queue[currentIdx];
+      DOM.wizardStudentName.textContent = st.name;
+      DOM.wizardCounter.textContent = `${currentIdx + 1}/${queue.length}`;
+      DOM.wizardProgress.style.width = `${((currentIdx + 1) / queue.length) * 100}%`;
+    };
+
+    const openWizard = () => {
+      // 랜덤 5명 추출 (실제 앱에서는 당일 기록 없는 학생 우선 색인 로직 적용)
+      state.wizardQueue = [...state.students].sort(() => 0.5 - Math.random()).slice(0, 5);
+      state.wizardCurrentIndex = 0;
+      
+      if(state.wizardQueue.length === 0) {
+        showToast('오늘은 더 이상 관찰을 갱신할 학생이 없습니다!');
+        return;
+      }
+      
+      DOM.wizardModal.classList.remove('translate-y-full', 'pointer-events-none');
+      DOM.wizardModal.classList.add('translate-y-0');
+      renderWizardStep();
+    };
+
+    const closeWizard = () => {
+      DOM.wizardModal.classList.add('translate-y-full', 'pointer-events-none');
+      DOM.wizardModal.classList.remove('translate-y-0');
+    };
+
+    DOM.btnFabWizard.addEventListener('click', openWizard);
+    DOM.btnCloseWizard.addEventListener('click', closeWizard);
+    
+    // 건너뛰기 로직
+    DOM.btnWizardSkip.addEventListener('click', () => {
+        state.wizardCurrentIndex++;
+        renderWizardStep();
+    });
+
+    // 마법사 태그 버튼 클릭 즉시 낙관적 저장 후 넥스트 스텝 수행
+    document.querySelectorAll('.wizard-btn-tag').forEach(btn => {
+       btn.addEventListener('click', async (e) => {
+          const tagId = e.currentTarget.dataset.tag;
+          const stId = state.wizardQueue[state.wizardCurrentIndex].id;
+          const stIdx = state.students.findIndex(s => s.id === stId);
+          if(stIdx === -1) return;
+          
+          const t = TAGS.find(x => x.id === tagId);
+          
+          // 낙관적 UI 즉시 반영
+          if(t.cat === '경고' || t.cat === '주의') state.students[stIdx].warningTagCount++;
+          else state.students[stIdx].positiveTagCount++;
+          
+          // 실제 Firebase 백그라운드 비동기 DB 갱신 API 호출 (await 대기 없는 무중단 갱신)
+          const obsRef = collection(db, 'observations');
+          addDoc(obsRef, {
+            teacherUid: state.user.uid,
+            studentId: stId,
+            tags: [tagId],
+            memo: '',
+            createdAt: serverTimestamp()
+          }).catch(console.error);
+
+          const stRef = doc(db, 'students', stId);
+          runTransaction(db, async (transaction) => {
+            const docSnap = await transaction.get(stRef);
+            if(!docSnap.exists()) return;
+            const wDelta = (t.cat === '경고' || t.cat === '주의') ? 1 : 0;
+            const pDelta = (t.cat === '긍정' || t.cat === '학습' || t.cat === '생활') ? 1 : 0;
+            transaction.update(stRef, { 
+              warningTagCount: docSnap.data().warningTagCount + wDelta, 
+              positiveTagCount: docSnap.data().positiveTagCount + pDelta 
             });
-            currentClassId = classRef.id;
+          }).catch(console.error);
+          
+          // 다음 학생으로 시각적 턴 넘김
+          state.wizardCurrentIndex++;
+          renderWizardStep();
+       });
+    });
 
-            const mockStudents = [
-                { name: "김철수", number: 1, gender: "남", initialCheckCompleted: false },
-                { name: "박민수", number: 2, gender: "남", initialCheckCompleted: true },
-                { name: "이영희", number: 3, gender: "여", initialCheckCompleted: false }
-            ];
-
-            for (const st of mockStudents) {
-                await addDoc(collection(db, 'students'), {
-                    classId: currentClassId,
-                    name: st.name,
-                    number: st.number,
-                    gender: st.gender,
-                    initialCheckCompleted: st.initialCheckCompleted,
-                    createdAt: serverTimestamp()
-                });
-            }
-            console.log("모의 데이터 생성 완료");
+    //==========================================
+    // 4. Firestore DB Fetching Logic
+    //==========================================
+    const fetchStudents = async () => {
+      try {
+        const q = query(collection(db, 'students'), where('teacherUid', '==', state.user.uid), orderBy('studentNo', 'asc'));
+        const snapshot = await getDocs(q);
+        
+        if(snapshot.empty) {
+           // 데이터가 아예 없는 교사의 최초 로그인인 경우, 더미 학생 명단 삽입하여 화면 제공 (온보딩)
+           const dummy = [
+             { name: '김철수', studentNo: 1, warningTagCount: 0, positiveTagCount: 0 },
+             { name: '이영희', studentNo: 2, warningTagCount: 0, positiveTagCount: 0 },
+             { name: '박지민', studentNo: 3, warningTagCount: 0, positiveTagCount: 0 },
+             { name: '정민수', studentNo: 4, warningTagCount: 0, positiveTagCount: 0 },
+             { name: '안지정', studentNo: 5, warningTagCount: 0, positiveTagCount: 0 },
+             { name: '강유리', studentNo: 6, warningTagCount: 0, positiveTagCount: 0 }
+           ];
+           state.students = [];
+           for(const d of dummy) {
+             const ref = doc(collection(db, 'students'));
+             const stData = { ...d, teacherUid: state.user.uid };
+             await setDoc(ref, stData);
+             state.students.push({ id: ref.id, ...stData });
+           }
+        } else {
+           state.students = [];
+           snapshot.forEach(docSnap => {
+              state.students.push({ id: docSnap.id, ...docSnap.data() });
+           });
         }
+        renderStudents();
+      } catch(error) {
+         console.error('Data Load Error', error);
+         showToast('데이터베이스 초기화 에러가 발생했습니다. (보안 규칙 또는 인증 오류)', 'error');
+         // UI 마비 방지를 위한 폴백 더미 출력
+         state.students = [{ id: 'err1', name: '에러 복구 모드', studentNo: 1, warningTagCount: 0, positiveTagCount: 0 }];
+         renderStudents();
+      }
+    };
 
-        // ==== 모달 UI 상태 제어 ====
-        const modalBackdrop = document.getElementById('modal-backdrop');
-        const tagModal = document.getElementById('tag-modal');
-        const memoModal = document.getElementById('memo-modal');
-        let selectedTags = [];
+    //==========================================
+    // 5. App Initialization & Auth Listener
+    //==========================================
+    
+    // GIS (Google Identity Services) 콜백 및 렌더링
+    window.handleCredentialResponse = async (response) => {
+      try {
+        // GIS에서 반환된 jwt(ID Token)를 Firebase Auth 자격 증명으로 변환
+        const credential = GoogleAuthProvider.credential(response.credential);
+        await signInWithCredential(auth, credential);
+      } catch (error) {
+        console.error("Login Failed", error);
+        showToast('로그인에 실패했습니다.', 'error');
+      }
+    };
 
-        window.openTagModal = function (studentId) {
-            const student = studentsData.find(s => s.id === studentId);
-            if (!student) return;
+    window.onload = () => {
+      if (typeof google === 'undefined') return;
+      google.accounts.id.initialize({
+        client_id: "229156278607-0ak7ia9t66evrac5mh4r70rr67sqcf5m.apps.googleusercontent.com",
+        callback: window.handleCredentialResponse
+      });
+      google.accounts.id.renderButton(
+        DOM.googleBtnContainer,
+        { theme: "outline", size: "large", type: "standard", width: 280 }  
+      );
+    };
 
-            document.getElementById('tag-target-student-id').value = studentId;
-            document.getElementById('tag-modal-title').textContent = `${student.name} 학생 태그 찍기`;
+    DOM.btnLogout.addEventListener('click', () => signOut(auth));
 
-            // 태그 선택 초기화
-            selectedTags = [];
-            document.querySelectorAll('.tag-btn').forEach(btn => {
-                btn.classList.remove('ring-2', 'ring-offset-2', 'ring-primary');
-            });
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        state.user = user;
+        DOM.avatarInit.textContent = user.displayName ? user.displayName.charAt(0) : 'T';
+        toggleView(true);
+        await fetchStudents(); 
+        showToast('환영합니다 선생님!');
+      } else {
+        state.user = null;
+        toggleView(false);
+      }
+    });
 
-            modalBackdrop.classList.remove('hidden');
-            tagModal.classList.remove('hidden');
-        };
-
-        window.closeTagModal = function () {
-            modalBackdrop.classList.add('hidden');
-            tagModal.classList.add('hidden');
-        };
-
-        window.openMemoModal = function (studentId) {
-            const student = studentsData.find(s => s.id === studentId);
-            if (!student) return;
-
-            document.getElementById('memo-target-student-id').value = studentId;
-            document.getElementById('memo-modal-title').textContent = `${student.name} 학생 관찰 메모하기`;
-            document.getElementById('memo-textarea').value = '';
-
-            modalBackdrop.classList.remove('hidden');
-            memoModal.classList.remove('hidden');
-        };
-
-        window.closeMemoModal = function () {
-            modalBackdrop.classList.add('hidden');
-            memoModal.classList.add('hidden');
-        };
-
-        const initialCheckModal = document.getElementById('initial-check-modal');
-        let uncompletedStudents = [];
-        let currentIcIndex = 0;
-
-        window.openInitialCheckModal = function () {
-            // 미완료 학생 필터링
-            uncompletedStudents = studentsData.filter(s => !s.initialCheckCompleted).sort((a, b) => a.number - b.number);
-
-            if (uncompletedStudents.length === 0) {
-                document.getElementById('ic-student-form-wrap').classList.add('hidden');
-                document.getElementById('btn-save-next-ic').classList.add('hidden');
-                document.getElementById('ic-no-more-students').classList.remove('hidden');
-            } else {
-                currentIcIndex = 0;
-                document.getElementById('ic-student-form-wrap').classList.remove('hidden');
-                document.getElementById('btn-save-next-ic').classList.remove('hidden');
-                document.getElementById('ic-no-more-students').classList.add('hidden');
-                renderInitialCheckForm();
-            }
-
-            modalBackdrop.classList.remove('hidden');
-            initialCheckModal.classList.remove('hidden');
-        };
-
-        window.closeInitialCheckModal = function () {
-            modalBackdrop.classList.add('hidden');
-            initialCheckModal.classList.add('hidden');
-        };
-
-        function renderInitialCheckForm() {
-            if (currentIcIndex >= uncompletedStudents.length || uncompletedStudents.length === 0) {
-                closeInitialCheckModal();
-                alert('모든 학생의 학기 초 성향 체크를 완료했습니다!');
-                return;
-            }
-
-            const student = uncompletedStudents[currentIcIndex];
-            document.getElementById('ic-student-id').value = student.id;
-            document.getElementById('ic-number').textContent = student.number;
-            document.getElementById('ic-name').textContent = student.name;
-            document.getElementById('ic-gender').textContent = student.gender;
-
-            // 폼 초기화
-            document.querySelectorAll('.ic-check').forEach(chk => chk.checked = false);
-            document.getElementById('ic-memo').value = '';
-
-            document.getElementById('ic-progress').textContent = `남은 대상: ${uncompletedStudents.length - currentIcIndex}명`;
-        }
-
-        document.getElementById('btn-save-next-ic').addEventListener('click', async () => {
-            const studentId = document.getElementById('ic-student-id').value;
-            if (!studentId) return;
-
-            const btnSaveNext = document.getElementById('btn-save-next-ic');
-            btnSaveNext.disabled = true;
-            btnSaveNext.textContent = '저장 중...';
-
-            const checkboxes = document.querySelectorAll('.ic-check:checked');
-            const traits = Array.from(checkboxes).map(c => c.value);
-            const memoContent = document.getElementById('ic-memo').value.trim();
-
-            try {
-                // 1. initialChecks 컬렉션 데이터 저장
-                const mockLocalTimestamp = { toMillis: () => Date.now() };
-                const newCheckData = {
-                    classId: currentClassId,
-                    studentId: studentId,
-                    traits: traits,
-                    memo: memoContent,
-                    createdAt: serverTimestamp()
-                };
-
-                await addDoc(collection(db, 'initialChecks'), newCheckData);
-
-                // 2. students 컬렉션 업데이트 (initialCheckCompleted = true)
-                const studentRef = doc(db, 'students', studentId);
-                await updateDoc(studentRef, {
-                    initialCheckCompleted: true,
-                    updatedAt: serverTimestamp()
-                });
-
-                // 로컬 상태 동기화
-                const stuNode = studentsData.find(s => s.id === studentId);
-                if (stuNode) {
-                    stuNode.initialCheckCompleted = true;
-                }
-
-                currentIcIndex++;
-                renderStudentGrid(); // UI(특히 V 체크마크) 갱신
-                renderInitialCheckForm(); // 다음 학생 렌더링
-            } catch (error) {
-                console.error("학기 초 성향 체크 저장 오류:", error);
-                alert("데이터 저장 중 오류가 발생했습니다.");
-            } finally {
-                btnSaveNext.disabled = false;
-                btnSaveNext.textContent = '저장 후 계속';
-            }
-        });
-
-        // ==== 태그 버튼 선택 이벤트 ====
-        document.querySelectorAll('.tag-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const target = e.currentTarget;
-                const tagData = {
-                    category: target.dataset.category,
-                    label: target.dataset.label,
-                    warningLevel: target.dataset.warning
-                };
-
-                const index = selectedTags.findIndex(t => t.label === tagData.label);
-                if (index > -1) {
-                    selectedTags.splice(index, 1);
-                    target.classList.remove('ring-2', 'ring-offset-2', 'ring-primary');
-                } else {
-                    selectedTags.push(tagData);
-                    target.classList.add('ring-2', 'ring-offset-2', 'ring-primary');
-                }
-            });
-        });
-
-        // ==== 메모 템플릿 버튼 이벤트 ====
-        document.querySelectorAll('.memo-template-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const textarea = document.getElementById('memo-textarea');
-                const textToAdd = e.currentTarget.dataset.text;
-                textarea.value = (textarea.value + ' ' + textToAdd).trim();
-            });
-        });
-
-        // ==== 저장 로직: 태그 ====
-        document.getElementById('btn-save-tag').addEventListener('click', async () => {
-            const studentId = document.getElementById('tag-target-student-id').value;
-            if (selectedTags.length === 0) {
-                alert('태그를 선택해주세요.');
-                return;
-            }
-
-            try {
-                for (const t of selectedTags) {
-                    // 동일 라벨이 있는지 확인
-                    const existingTag = tagsData.find(tag => tag.studentId === studentId && tag.label === t.label);
-
-                    if (existingTag) {
-                        const tagRef = doc(db, 'tags', existingTag.id);
-                        await updateDoc(tagRef, {
-                            count: increment(1),
-                            updatedAt: serverTimestamp()
-                        });
-                        existingTag.count += 1; // 로컬 상태 업데이트
-                    } else {
-                        const newTag = {
-                            classId: currentClassId,
-                            studentId: studentId,
-                            category: t.category,
-                            label: t.label,
-                            warningLevel: t.warningLevel || null,
-                            count: 1,
-                            createdAt: serverTimestamp(),
-                            updatedAt: serverTimestamp()
-                        };
-                        const docRef = await addDoc(collection(db, 'tags'), newTag);
-                        tagsData.push({ id: docRef.id, ...newTag }); // 로컬 상태 업데이트
-                    }
-                }
-
-                closeTagModal();
-                renderStudentGrid(); // UI 갱신
-            } catch (error) {
-                console.error("태그 저장 실패:", error);
-                alert("저장 중 오류가 발생했습니다.");
-            }
-        });
-
-        // ==== 저장 로직: 메모 ====
-        document.getElementById('btn-save-memo').addEventListener('click', async () => {
-            const studentId = document.getElementById('memo-target-student-id').value;
-            const content = document.getElementById('memo-textarea').value.trim();
-
-            if (!content) {
-                alert('메모 내용을 입력해주세요.');
-                return;
-            }
-
-            try {
-                // 임의로 로컬 시간을 createdAt으로 사용하여 렌더링 즉각 반영 (서버타임스탬프 대체)
-                const mockLocalTimestamp = { toMillis: () => Date.now() };
-                const newMemo = {
-                    classId: currentClassId,
-                    studentId: studentId,
-                    content: content,
-                    createdAt: serverTimestamp() // DB 저장용
-                };
-
-                const docRef = await addDoc(collection(db, 'observations'), newMemo);
-
-                // 로컬 렌더링을 위해 임시 타임스탬프 주입
-                obsData.push({ id: docRef.id, ...newMemo, createdAt: mockLocalTimestamp });
-
-                closeMemoModal();
-                renderStudentGrid(); // UI 갱신
-            } catch (error) {
-                console.error("메모 저장 실패:", error);
-                alert("저장 중 오류가 발생했습니다.");
-            }
-        });
-
-        function renderStudentGrid() {
-            const grid = document.getElementById('student-grid');
-            grid.innerHTML = '';
-
-            if (studentsData.length === 0) {
-                grid.innerHTML = `<div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-10 text-slate-500">등록된 학생이 없습니다.</div>`;
-                return;
-            }
-
-            studentsData.forEach(student => {
-                const stTags = tagsData.filter(t => t.studentId === student.id);
-                const warningCount = stTags.filter(t => t.warningLevel === 'caution' || t.warningLevel === 'alert').reduce((sum, t) => sum + t.count, 0);
-
-                // 시간 역순 (createdAt이 없거나 pending 상태 처리 방어 로직)
-                const stObs = obsData.filter(o => o.studentId === student.id)
-                    .sort((a, b) => {
-                        const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : Date.now();
-                        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : Date.now();
-                        return timeB - timeA;
-                    });
-
-                const recentObs = stObs.length > 0 ? stObs[0].content : "관찰 기록이 없습니다.";
-
-                const tagsHtml = stTags.map(tag => {
-                    let bg = "bg-slate-50", text = "text-slate-700";
-                    if (tag.category === 'personality') { bg = "bg-sky-50"; text = "text-sky-700"; }
-                    else if (tag.category === 'learning') { bg = "bg-indigo-50"; text = "text-indigo-700"; }
-                    else if (tag.category === 'behavior' && !tag.warningLevel) { bg = "bg-green-50"; text = "text-green-700"; }
-                    else if (tag.warningLevel === 'caution') { bg = "bg-amber-50"; text = "text-amber-700"; }
-                    else if (tag.warningLevel === 'alert') { bg = "bg-red-50"; text = "text-red-700"; }
-                    return `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${bg} ${text}">${tag.label} ${tag.count > 1 ? tag.count : ''}</span>`;
-                }).join('');
-
-                const bgGender = student.gender === '남' ? 'bg-sky-100 text-sky-700' : 'bg-rose-100 text-rose-700';
-
-                const cardHtml = `
-                    <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-200">
-                        <div class="px-4 py-5 sm:p-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10 rounded-full ${bgGender} flex items-center justify-center font-bold text-lg">
-                                        ${student.number}
-                                    </div>
-                                    <div class="ml-4">
-                                        <h3 class="text-lg leading-6 font-medium text-slate-900">${student.name} <span class="text-sm text-slate-500 font-normal ml-1">${student.gender}</span></h3>
-                                    </div>
-                                </div>
-                                ${warningCount >= 3 ? `<span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-medium">주의필요 ${warningCount}</span>` : ''}
-                            </div>
-                            <div class="flex flex-wrap gap-1 mb-4 h-12 overflow-hidden content-start">
-                                ${tagsHtml}
-                            </div>
-                            <div class="text-sm text-slate-600 line-clamp-2 bg-slate-50 p-3 rounded border border-slate-100 italic h-16">
-                                ${recentObs}
-                            </div>
-                        </div>
-                        <div class="bg-slate-50 px-4 py-3 sm:px-6 flex justify-between border-t border-slate-200">
-                            <button class="text-sm font-medium text-primary hover:text-primary-hover btn-ripple flex items-center" onclick="openTagModal('${student.id}')">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                                태그찍기
-                            </button>
-                            <button class="text-sm font-medium text-primary hover:text-primary-hover btn-ripple flex items-center" onclick="openMemoModal('${student.id}')">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                메모
-                            </button>
-                        </div>
-                    </div>
-                `;
-                grid.innerHTML += cardHtml;
-            });
-        }
-    </script>
+  </script>
 </body>
-
 </html>

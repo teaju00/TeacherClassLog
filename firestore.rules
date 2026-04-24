@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 로그인 여부 (인증 토큰 존재 여부) 확인
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // 선생님 본인(요청자와 문서의 uid 일치)인지 검증
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+    
+    // 1. 학생 데이터 (학생 목록 및 집계된 태그 횟수 보관)
+    match /students/{studentId} {
+      allow read: if isOwner(resource.data.teacherUid);
+      
+      // 스키마 검증: 필수 필드가 존재하고 타입이 일치하는지 제약
+      allow create: if isOwner(request.resource.data.teacherUid)
+                    && request.resource.data.keys().hasAll(['teacherUid', 'name', 'studentNo', 'positiveTagCount', 'warningTagCount'])
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.studentNo is number;
+                    
+      // 업데이트 제약: teacherUid를 남의 것으로 절대 바꿀 수 없도록 방어
+      allow update: if isOwner(resource.data.teacherUid)
+                    && isOwner(request.resource.data.teacherUid)
+                    && request.resource.data.name is string
+                    && request.resource.data.studentNo is number;
+                    
+      allow delete: if isOwner(resource.data.teacherUid);
+    }
+
+    // 2. 관찰 기록 일지 데이터 (건별 시퀀스 데이터베이스)
+    match /observations/{obsId} {
+      allow read: if isOwner(resource.data.teacherUid);
+      
+      // 스키마 검증: 필수 필드 구조 확인. Memo는 선택이나 기본 String으로 넘어옴
+      allow create: if isOwner(request.resource.data.teacherUid)
+                    && request.resource.data.keys().hasAll(['teacherUid', 'studentId', 'tags', 'createdAt'])
+                    && request.resource.data.tags is list;
+                    
+      // 관찰 일지는 원칙상 수정/삭제 불가 (Append-only Log 속성 유지)
+      allow update, delete: if false;
+    }
+  }
+}
