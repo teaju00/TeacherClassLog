@@ -451,7 +451,7 @@
     //==========================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, runTransaction, serverTimestamp, query, where, orderBy, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, serverTimestamp, query, where, orderBy, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
     // Firebase 웹 앱 설정 (선생님 발급 키 적용 완료)
     const firebaseConfig = {
@@ -712,8 +712,8 @@
       const stIndex = state.students.findIndex(s => s.id === state.activeStudentId);
       if (stIndex === -1) return;
 
-      // 1. Rollback용 데이터 백업 깊은 복사
-      const prevStudentState = JSON.parse(JSON.stringify(state.students[stIndex]));
+      // 1. 필요한 필드만 백업 (실패 시 롤백용)
+      const { warningTagCount, positiveTagCount, lastObservedAt } = state.students[stIndex];
 
       // 태그 연산
       let warningDelta = 0; let positiveDelta = 0;
@@ -723,11 +723,9 @@
         if (t.cat === '긍정' || t.cat === '학습' || t.cat === '생활') positiveDelta++;
       });
 
-      // 2. Optimistic UI 선 반영 및 뷰 새로고침
+      // 2. 즉시 UI 업데이트 및 닫기 (Optimistic Update)
       state.students[stIndex].warningTagCount += warningDelta;
       state.students[stIndex].positiveTagCount += positiveDelta;
-      state.students[stIndex].lastObservedAt = new Date(); // 최근 관찰 시각 갱신
-
       renderStudents();        // 화면 즉시 리렌더링
       closeBottomSheet();      // 체감 지연 0초
       showToast('성공적으로 저장되었습니다.');
