@@ -974,7 +974,7 @@
     const fetchStudents = async () => {
       try {
         const q = query(collection(db, 'students'), where('teacherUid', '==', state.user.uid), orderBy('studentNo', 'asc'));
-        
+
         // Timeout wrapper for getDocs to prevent infinite loading on network issues
         const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
         const snapshot = await Promise.race([getDocs(q), timeoutPromise]);
@@ -1257,9 +1257,9 @@
       } catch (error) {
         console.error(error);
         if (error.message === 'timeout') {
-           showToast('서버 응답 시간이 초과되었습니다. 네트워크 상태를 확인해주세요.', 'error');
+          showToast('서버 응답 시간이 초과되었습니다. 네트워크 상태를 확인해주세요.', 'error');
         } else {
-           showToast('Firestore 데이터 저장에 실패했습니다. (네트워크/방화벽 확인)', 'error');
+          showToast('Firestore 데이터 저장에 실패했습니다. (네트워크/방화벽 확인)', 'error');
         }
       } finally {
         DOM.btnSaveSettings.innerHTML = '명단 일괄 저장';
