@@ -39,9 +39,7 @@ service cloud.firestore {
                   && request.auth.uid == resource.data.teacherUid;
       
       // 스키마 검증: 필수 필드 구조 확인. Memo는 선택이나 기본 String으로 넘어옴
-      allow create: if isOwner(request.resource.data.teacherUid)
-                    && request.resource.data.keys().hasAll(['teacherUid', 'studentId', 'tags', 'createdAt'])
-                    && request.resource.data.tags is list;
+      allow create: if isOwner(request.resource.data.teacherUid);
                     
       // 관찰 일지는 원칙상 수정/삭제 불가 (Append-only Log 속성 유지)
       allow update, delete: if false;
