@@ -1210,19 +1210,21 @@
           const q = query(obsRef, where('teacherUid', '==', state.user.uid), where('studentId', '==', studentId));
           const snapshot = await getDocs(q);
 
-          const batch = writeBatch(db);
-          snapshot.forEach(docSnap => {
-            batch.delete(docSnap.ref);
-          });
+          // 500개씩 분할하여 삭제 (Firestore Batch 제한 대응)
+          const docs = snapshot.docs;
+          for (let i = 0; i < docs.length; i += 500) {
+            const batch = writeBatch(db);
+            const chunk = docs.slice(i, i + 500);
+            chunk.forEach(docSnap => batch.delete(docSnap.ref));
+            await batch.commit();
+          }
 
           // 2. 학생 카운트 리셋
           const stRef = doc(db, 'students', studentId);
-          batch.update(stRef, {
+          await updateDoc(stRef, {
             warningTagCount: 0,
             positiveTagCount: 0
           });
-
-          await batch.commit();
         }
 
         // 로컬 업데이트
@@ -1234,7 +1236,7 @@
         showToast('모든 기록이 삭제되었습니다.');
       } catch (err) {
         console.error('Delete All Error:', err);
-        showToast('전체 삭제 실패: ' + err.message, 'error');
+        showToast('전체 삭제 실패: ' + (err.code || err.message), 'error');
       }
     };
 
@@ -1250,23 +1252,31 @@
         if (state.user?.isDev) {
           state.students.forEach(s => { s.warningTagCount = 0; s.positiveTagCount = 0; });
         } else {
-          // 1. 모든 관찰 기록 삭제
+          // 1. 모든 관찰 기록 삭제 (500건씩 분할 처리)
           const obsRef = collection(db, 'observations');
           const q = query(obsRef, where('teacherUid', '==', state.user.uid));
           const snapshot = await getDocs(q);
+          const obsDocs = snapshot.docs;
+          
+          for (let i = 0; i < obsDocs.length; i += 500) {
+            const batch = writeBatch(db);
+            obsDocs.slice(i, i + 500).forEach(docSnap => batch.delete(docSnap.ref));
+            await batch.commit();
+          }
 
-          const batch = writeBatch(db);
-          snapshot.forEach(docSnap => batch.delete(docSnap.ref));
-
-          // 2. 모든 학생 카운트 초기화
+          // 2. 모든 학생 카운트 초기화 (500건씩 분할 처리)
           const stRefPrefix = collection(db, 'students');
           const stQ = query(stRefPrefix, where('teacherUid', '==', state.user.uid));
           const stSnapshot = await getDocs(stQ);
-          stSnapshot.forEach(docSnap => {
-            batch.update(docSnap.ref, { warningTagCount: 0, positiveTagCount: 0 });
-          });
+          const stDocs = stSnapshot.docs;
 
-          await batch.commit();
+          for (let i = 0; i < stDocs.length; i += 500) {
+            const batch = writeBatch(db);
+            stDocs.slice(i, i + 500).forEach(docSnap => {
+              batch.update(docSnap.ref, { warningTagCount: 0, positiveTagCount: 0 });
+            });
+            await batch.commit();
+          }
         }
 
         // 로컬 상태 즉시 반영
@@ -1280,7 +1290,7 @@
         showToast('모든 데이터가 초기화되었습니다.');
       } catch (err) {
         console.error('Master Reset Error:', err);
-        showToast('초기화 실패: ' + (err.code || err.message), 'error');
+        showToast('초기화 실패: ' + (err.code || err.message || '권한 또는 네트워크 오류'), 'error');
       }
     };
     DOM.btnMasterDataReset.addEventListener('click', performMasterDataReset);
