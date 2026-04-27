@@ -216,7 +216,8 @@
 
   <div id="bottom-sheet"
     class="fixed inset-x-0 bottom-0 bg-surface rounded-t-2xl shadow-xl z-40 transform translate-y-full transition-transform duration-300 flex flex-col max-h-[85vh]">
-    <div class="px-5 py-4 border-b border-borderDiv flex items-center justify-between bg-surface rounded-t-2xl sticky top-0 z-10">
+    <div
+      class="px-5 py-4 border-b border-borderDiv flex items-center justify-between bg-surface rounded-t-2xl sticky top-0 z-10">
       <h2 id="bs-student-name" class="text-lg font-bold text-textPrimary">태그 추가</h2>
       <button id="btn-close-bs" class="p-2 -mr-2 text-textSecondary active:bg-gray-100 rounded-full">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
@@ -374,15 +375,42 @@
         <!-- JS Injected List -->
       </div>
 
-      <div class="mt-12 pt-6 flex justify-center">
-        <button id="btn-logout"
-          class="py-2 px-6 bg-red-50 text-red-600 font-bold text-sm shadow-sm rounded-full border border-red-100 active:bg-red-100 flex items-center">
-          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-          </svg>
-          구글 계정 로그아웃
-        </button>
+      <!-- Account & Danger Zone Redesign -->
+      <div class="mt-16 space-y-8 pb-10">
+        <!-- Account Section -->
+        <div class="border-t border-gray-100 pt-8">
+          <h4 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 px-1">계정 관리</h4>
+          <div class="bg-gray-50 rounded-2xl p-4 flex items-center justify-between border border-gray-100">
+            <div class="flex items-center gap-3">
+              <div id="settings-avatar"
+                class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+                ?</div>
+              <div>
+                <div id="settings-user-name" class="text-sm font-bold text-textPrimary text-left">선생님</div>
+                <div class="text-[10px] text-textSecondary text-left">Google 계정으로 연결됨</div>
+              </div>
+            </div>
+            <button id="btn-logout"
+              class="px-3 py-2 bg-white border border-gray-200 text-gray-600 text-xs font-bold rounded-lg active:bg-gray-100 transition-colors shadow-sm">로그아웃</button>
+          </div>
+        </div>
+
+        <!-- Danger Zone Section -->
+        <div class="bg-rose-50/50 rounded-2xl p-5 border border-rose-100">
+          <div class="flex items-center gap-2 mb-3 text-rose-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+              </path>
+            </svg>
+            <h4 class="text-xs font-bold uppercase tracking-tight">데이터 초기화</h4>
+          </div>
+          <p class="text-[11px] text-rose-500/80 mb-4 leading-relaxed">모든 학생의 태그 카운트를 0으로 초기화하고 모든 관찰 내역을 영구적으로 삭제합니다. 이
+            작업은 되돌릴 수 없습니다.</p>
+          <button id="btn-master-data-reset"
+            class="w-full py-3 bg-white border border-rose-200 text-rose-600 font-bold rounded-xl text-xs active:bg-rose-100 transition-all shadow-sm">서버
+            데이터 전체 초기화</button>
+        </div>
       </div>
     </div>
 
@@ -417,17 +445,20 @@
   <!-- History Modal -->
   <div id="history-modal"
     class="fixed inset-0 bg-surface z-50 transform translate-y-full transition-transform duration-300 flex flex-col pointer-events-none">
-      <div class="flex justify-between items-center px-5 py-4 border-b border-borderDiv bg-surface sticky top-0 z-10 shadow-sm">
-        <h2 id="history-student-name" class="text-xl font-bold text-textPrimary">학생 기록 상세</h2>
-        <div class="flex items-center gap-2">
-          <button id="btn-delete-all-history" class="text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 active:bg-red-100 transition-colors">전체 삭제</button>
-          <button id="btn-close-history" class="p-2 -mr-2 text-textSecondary active:bg-gray-100 rounded-full">
-            <svg fill="none" class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+    <div
+      class="flex justify-between items-center px-5 py-4 border-b border-borderDiv bg-surface sticky top-0 z-10 shadow-sm">
+      <h2 id="history-student-name" class="text-xl font-bold text-textPrimary">학생 기록 상세</h2>
+      <div class="flex items-center gap-2">
+        <button id="btn-delete-all-history"
+          class="text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 active:bg-red-100 transition-colors">전체
+          삭제</button>
+        <button id="btn-close-history" class="p-2 -mr-2 text-textSecondary active:bg-gray-100 rounded-full">
+          <svg fill="none" class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
+    </div>
 
     <div class="flex-1 overflow-y-auto bg-gray-50 p-4">
       <ul id="history-list" class="space-y-3">
@@ -508,7 +539,7 @@
       { id: 'lp8', label: '수업 중 졸음', cat: '학습 참여', type: '부정' },
       { id: 'lp9', label: '수업 참여 회피', cat: '학습 참여', type: '부정' },
       { id: 'lp10', label: '핸드폰·기기 무단 사용', cat: '학습 참여', type: '부정' },
-      
+
       { id: 'lh1', label: '정리정돈 잘함', cat: '학습 습관', type: '긍정' },
       { id: 'lh2', label: '노트 정리 우수', cat: '학습 습관', type: '긍정' },
       { id: 'lh3', label: '시간 관리 우수', cat: '학습 습관', type: '긍정' },
@@ -516,7 +547,7 @@
       { id: 'lh5', label: '준비물 미지참', cat: '학습 습관', type: '부정' },
       { id: 'lh6', label: '학습 포기 경향', cat: '학습 습관', type: '부정' },
       { id: 'lh7', label: '과제 미완성 제출', cat: '학습 습관', type: '부정' },
-      
+
       { id: 'sc1', label: '친구 배려/도움', cat: '사회성', type: '긍정' },
       { id: 'sc2', label: '협력·팀워크 우수', cat: '사회성', type: '긍정' },
       { id: 'sc3', label: '리더십 발휘', cat: '사회성', type: '긍정' },
@@ -526,7 +557,7 @@
       { id: 'sc7', label: '또래 따돌림 피해', cat: '사회성', type: '관찰' },
       { id: 'sc8', label: '사회적 위축', cat: '사회성', type: '관찰' },
       { id: 'sc9', label: '과도한 의존', cat: '사회성', type: '관찰' },
-      
+
       { id: 'em1', label: '감정 조절 우수', cat: '정서', type: '긍정' },
       { id: 'em2', label: '긍정적 태도', cat: '정서', type: '긍정' },
       { id: 'em3', label: '회복탄력성', cat: '정서', type: '긍정' },
@@ -536,7 +567,7 @@
       { id: 'em7', label: '불안·긴장 높음', cat: '정서', type: '관찰' },
       { id: 'em8', label: '무기력·우울 경향', cat: '정서', type: '관찰' },
       { id: 'em9', label: '자존감 저하 표현', cat: '정서', type: '관찰' },
-      
+
       { id: 'ru1', label: '예의 바름', cat: '생활규범', type: '긍정' },
       { id: 'ru2', label: '규칙 준수', cat: '생활규범', type: '긍정' },
       { id: 'ru3', label: '봉사·공동체 기여', cat: '생활규범', type: '긍정' },
@@ -546,7 +577,7 @@
       { id: 'ru7', label: '거짓말·변명 반복', cat: '생활규범', type: '부정' },
       { id: 'ru8', label: '타인 물건 무단 사용', cat: '생활규범', type: '부정' },
       { id: 'ru9', label: '외모·신체 비하 발언', cat: '생활규범', type: '부정' },
-      
+
       { id: 'he1', label: '위험 행동', cat: '건강', type: '부정' },
       { id: 'he2', label: '자해·자살 위험 신호', cat: '건강', type: '부정' },
       { id: 'he3', label: '신체 건강 이상 호소', cat: '건강', type: '관찰' },
@@ -605,9 +636,12 @@
       settingsModal: document.getElementById('settings-modal'),
       btnCloseSettings: document.getElementById('btn-close-settings'),
       btnSaveSettings: document.getElementById('btn-save-settings'),
+      btnMasterDataReset: document.getElementById('btn-master-data-reset'),
       settingsStudentList: document.getElementById('settings-student-list'),
       btnAddStudentRow: document.getElementById('btn-add-student-row'),
       settingsCount: document.getElementById('settings-count'),
+      settingsAvatar: document.getElementById('settings-avatar'),
+      settingsUserName: document.getElementById('settings-user-name'),
       // (btnLogout는 상단에서 참조됨)
 
       // History Modal DOMs
@@ -726,10 +760,10 @@
         const tagsHtml = group.tags.map(tag => {
           const isSelected = state.selectedTags.has(tag.id);
           const color = TAG_CATEGORIES[tag.type] || { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-300' };
-          
+
           let colorClass = `bg-white text-slate-600 border-slate-200 active:bg-slate-50`;
           if (isSelected) {
-             colorClass = `${color.bg} ${color.text} ${color.border} border-2 font-bold shadow-sm`;
+            colorClass = `${color.bg} ${color.text} ${color.border} border-2 font-bold shadow-sm`;
           }
 
           return `<button class="chip px-4 py-2 rounded-lg flex justify-center items-center transition-all text-xs border ${colorClass} min-h-[44px]" data-id="${tag.id}">
@@ -775,10 +809,10 @@
       state.selectedTags.clear();
       DOM.bsStudentName.textContent = `${studentName} 관찰 추가`;
       DOM.memoInput.value = '';
-      DOM.memoContainer.classList.add('hide'); 
+      DOM.memoContainer.classList.add('hide');
 
       renderTagTabs();
-      renderChips(); 
+      renderChips();
 
       // 슬라이딩 애니메이션 실행
       DOM.backdrop.classList.remove('pointer-events-none', 'opacity-0');
@@ -836,17 +870,19 @@
 
       currentTags.forEach(id => {
         const t = TAGS.find(x => x.id === id);
-        if (t.type === '부정') warningDelta++;
-        if (t.type === '긍정') positiveDelta++;
+        if (t) {
+          if (t.type === '부정') warningDelta++;
+          if (t.type === '긍정') positiveDelta++;
+        }
       });
 
       // 2. 즉시 UI 업데이트 및 닫기 (Optimistic Update)
       state.students[stIndex].warningTagCount += warningDelta;
       state.students[stIndex].positiveTagCount += positiveDelta;
       state.students[stIndex].lastObservedAt = new Date();
-      
+
       saveRecentTags(currentTags);
-      
+
       renderStudents();        // 화면 즉시 리렌더링
       closeBottomSheet();      // 체감 지연 0초 (여기서 global state.activeStudentId = null 처리됨)
       showToast('성공적으로 저장되었습니다.');
@@ -1008,7 +1044,7 @@
       try {
         const obsRef = collection(db, 'observations');
         const q = query(obsRef, where('teacherUid', '==', state.user.uid), where('studentId', '==', studentId));
-        
+
         // Timeout wrapper for getDocs
         const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
         const snapshot = await Promise.race([getDocs(q), timeoutPromise]);
@@ -1032,7 +1068,7 @@
       } catch (err) {
         console.error('History Load Error:', err);
         DOM.historyEmpty.classList.remove('hide');
-        
+
         let errMsg = '데이터 로드 오류';
         if (err.message === 'timeout') {
           errMsg = '서버 응답 시간 초과 (네트워크 확인)';
@@ -1043,7 +1079,7 @@
         } else {
           errMsg = `로드 오류: ${err.code || err.message || '알 수 없음'}`;
         }
-        
+
         DOM.historyEmpty.textContent = errMsg;
       } finally {
         DOM.historyLoading.classList.add('hide');
@@ -1107,7 +1143,7 @@
       // 차감될 카운트 계산
       let warningDelta = 0;
       let positiveDelta = 0;
-      tags.forEach(tid => {
+      (tags || []).forEach(tid => {
         const t = TAGS.find(x => x.id === tid);
         if (t) {
           if (t.type === '부정') warningDelta++;
@@ -1117,14 +1153,13 @@
 
       // 낙관적 UI 업데이트
       const prevStudentState = { ...state.students[stIndex] };
-      state.students[stIndex].warningTagCount = Math.max(0, state.students[stIndex].warningTagCount - warningDelta);
-      state.students[stIndex].positiveTagCount = Math.max(0, state.students[stIndex].positiveTagCount - positiveDelta);
-      
-      showToast('삭제 중입니다...');
+      state.students[stIndex].warningTagCount = Math.max(0, (state.students[stIndex].warningTagCount || 0) - warningDelta);
+      state.students[stIndex].positiveTagCount = Math.max(0, (state.students[stIndex].positiveTagCount || 0) - positiveDelta);
+
+      showToast('기록을 삭제 중입니다...');
       renderStudents();
       renderStats();
-      
-      // 실제 삭제 요청 (트랜잭션)
+
       try {
         if (state.user?.isDev) {
           console.log('[DEV] Deleted locally');
@@ -1135,22 +1170,23 @@
           await runTransaction(db, async (transaction) => {
             const stSnap = await transaction.get(stRef);
             if (!stSnap.exists()) throw new Error("학생 데이터가 없습니다.");
-            
+
+            const currentData = stSnap.data();
             transaction.delete(obsRef);
             transaction.update(stRef, {
-              warningTagCount: Math.max(0, (stSnap.data().warningTagCount || 0) - warningDelta),
-              positiveTagCount: Math.max(0, (stSnap.data().positiveTagCount || 0) - positiveDelta)
+              warningTagCount: Math.max(0, (currentData.warningTagCount || 0) - warningDelta),
+              positiveTagCount: Math.max(0, (currentData.positiveTagCount || 0) - positiveDelta)
             });
           });
         }
-        showToast('성공적으로 삭제되었습니다.');
-        openHistoryModal(studentId, state.students[stIndex].name); // 목록 새로고침
+        showToast('기록이 삭제되었습니다.');
+        openHistoryModal(studentId, state.students[stIndex].name);
       } catch (err) {
         console.error('Delete Error:', err);
         state.students[stIndex] = prevStudentState; // 복구
         renderStudents();
         renderStats();
-        showToast('삭제 실패: ' + err.message, 'error');
+        showToast('삭제 실패: ' + (err.code || err.message), 'error');
       }
     };
 
@@ -1163,7 +1199,7 @@
       if (!confirm(`${studentName} 학생의 모든 관찰 기록을 삭제하고 카운트를 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
 
       showToast('모든 기록을 삭제 중입니다...');
-      
+
       try {
         if (state.user?.isDev) {
           state.students[stIndex].warningTagCount = 0;
@@ -1203,6 +1239,51 @@
     };
 
     DOM.btnDeleteAllHistory.addEventListener('click', deleteAllRecordsForStudent);
+
+    // [New] 서버 데이터 전체 초기화 로직 (카운트 0 + 기록 전체 삭제)
+    const performMasterDataReset = async () => {
+      if (!confirm('정말로 모든 학생의 누적 카운트를 0으로 초기화하고 모든 관찰 기록을 삭제하시겠습니까?\n이 작업은 모든 학생에게 적용되며 복구할 수 없습니다.')) return;
+
+      showToast('데이터 전체 초기화 중...', 'info');
+
+      try {
+        if (state.user?.isDev) {
+          state.students.forEach(s => { s.warningTagCount = 0; s.positiveTagCount = 0; });
+        } else {
+          // 1. 모든 관찰 기록 삭제
+          const obsRef = collection(db, 'observations');
+          const q = query(obsRef, where('teacherUid', '==', state.user.uid));
+          const snapshot = await getDocs(q);
+
+          const batch = writeBatch(db);
+          snapshot.forEach(docSnap => batch.delete(docSnap.ref));
+
+          // 2. 모든 학생 카운트 초기화
+          const stRefPrefix = collection(db, 'students');
+          const stQ = query(stRefPrefix, where('teacherUid', '==', state.user.uid));
+          const stSnapshot = await getDocs(stQ);
+          stSnapshot.forEach(docSnap => {
+            batch.update(docSnap.ref, { warningTagCount: 0, positiveTagCount: 0 });
+          });
+
+          await batch.commit();
+        }
+
+        // 로컬 상태 즉시 반영
+        state.students.forEach(s => {
+          s.warningTagCount = 0;
+          s.positiveTagCount = 0;
+        });
+
+        renderStudents();
+        renderStats();
+        showToast('모든 데이터가 초기화되었습니다.');
+      } catch (err) {
+        console.error('Master Reset Error:', err);
+        showToast('초기화 실패: ' + (err.code || err.message), 'error');
+      }
+    };
+    DOM.btnMasterDataReset.addEventListener('click', performMasterDataReset);
 
     DOM.btnCloseHistory.addEventListener('click', () => {
       DOM.historyModal.classList.add('translate-y-full', 'pointer-events-none');
@@ -1244,13 +1325,13 @@
           snapshot.forEach(docSnap => {
             const data = docSnap.data();
             if (!data.className) data.className = '기본 학급'; // 하위 호환성 폴백
-            
+
             // 카운트 필드 강제 초기화 (사용자 요청: 이전 데이터 초기화 대응)
             const warningTagCount = typeof data.warningTagCount === 'number' ? data.warningTagCount : 0;
             const positiveTagCount = typeof data.positiveTagCount === 'number' ? data.positiveTagCount : 0;
-            
-            state.students.push({ 
-              id: docSnap.id, 
+
+            state.students.push({
+              id: docSnap.id,
               ...data,
               warningTagCount,
               positiveTagCount
@@ -1269,18 +1350,18 @@
         renderStudents();
       } catch (error) {
         console.error('Data Load Error', error);
-        
+
         let errorMsg = '데이터베이스 초기화 에러가 발생했습니다.';
         if (error.message === 'timeout') {
-            errorMsg = '서버 응답 시간이 초과되었습니다. (네트워크/방화벽 확인)';
+          errorMsg = '서버 응답 시간이 초과되었습니다. (네트워크/방화벽 확인)';
         } else if (error.code === 'permission-denied') {
-            errorMsg = '접근 권한이 없습니다. (보안 규칙 문제)';
+          errorMsg = '접근 권한이 없습니다. (보안 규칙 문제)';
         } else if (error.message && error.message.includes('index')) {
-            errorMsg = '데이터베이스 인덱스가 아직 생성 중입니다. 5분 뒤 다시 시도해주세요.';
+          errorMsg = '데이터베이스 인덱스가 아직 생성 중입니다. 5분 뒤 다시 시도해주세요.';
         } else {
-            errorMsg = `DB 에러: ${error.message || error.code || '알 수 없는 오류'}`;
+          errorMsg = `DB 에러: ${error.message || error.code || '알 수 없는 오류'}`;
         }
-        
+
         showToast(errorMsg, 'error');
         // UI 마비 방지를 위한 폴백 더미 출력
         state.students = [{ id: 'err1', name: '에러 복구 모드', studentNo: 1, warningTagCount: 0, positiveTagCount: 0 }];

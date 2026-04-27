@@ -44,8 +44,9 @@ service cloud.firestore {
       // 스키마 검증: 필수 필드 구조 확인
       allow create: if isOwner(request.resource.data.teacherUid);
                      
-      // 관찰 일지는 원칙상 수정/삭제 불가 (Append-only Log 속성 유지)
-      allow update, delete: if false;
+      // 본인 기록인 경우 삭제 허용
+      allow delete: if isOwner(resource.data.teacherUid);
+      allow update: if false;
     }
   }
 }
