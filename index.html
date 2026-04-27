@@ -864,7 +864,7 @@
       const prevStudentState = { ...state.students[stIndex] };
 
       // 태그 연산
-      let warningDelta = 0; let positiveDelta = 0;
+      let warningDelta = 0; let positiveDelta = 0; let observationDelta = 0;
       const currentTags = Array.from(state.selectedTags);
       const currentMemo = DOM.memoInput.value.trim();
 
@@ -872,13 +872,15 @@
         const t = TAGS.find(x => x.id === id);
         if (t) {
           if (t.type === '부정') warningDelta++;
-          if (t.type === '긍정') positiveDelta++;
+          else if (t.type === '긍정') positiveDelta++;
+          else if (t.type === '관찰') observationDelta++;
         }
       });
 
       // 2. 즉시 UI 업데이트 및 닫기 (Optimistic Update)
       state.students[stIndex].warningTagCount += warningDelta;
       state.students[stIndex].positiveTagCount += positiveDelta;
+      state.students[stIndex].observationTagCount = (state.students[stIndex].observationTagCount || 0) + observationDelta;
       state.students[stIndex].lastObservedAt = new Date();
 
       saveRecentTags(currentTags);
@@ -911,6 +913,7 @@
           transaction.update(stRef, {
             warningTagCount: (docSnap.data().warningTagCount || 0) + warningDelta,
             positiveTagCount: (docSnap.data().positiveTagCount || 0) + positiveDelta,
+            observationTagCount: (docSnap.data().observationTagCount || 0) + observationDelta,
             lastObservedAt: serverTimestamp()
           });
         });
@@ -979,7 +982,7 @@
           <li class="py-3 flex justify-between items-center transition-colors cursor-pointer hover:bg-gray-50 active:bg-gray-100 px-2 rounded-lg btn-history-trigger" data-id="${s.id}" data-name="${s.name}">
             <span class="font-medium text-textPrimary">${s.name} <span class="text-xs text-textSecondary ml-1">${s.studentNo}번</span></span> 
             <span class="bg-gray-50 text-gray-600 text-xs px-2 py-1 rounded-full font-bold border border-gray-200 flex items-center">
-              총 ${s.warningTagCount + s.positiveTagCount}건
+              총 ${(s.warningTagCount || 0) + (s.positiveTagCount || 0) + (s.observationTagCount || 0)}건
             </span>
           </li>`).join('')
         : `<li class="py-10 text-center text-sm text-textSecondary font-medium flex flex-col items-center">학생이 없습니다.</li>`;
@@ -1151,11 +1154,13 @@
       // 차감될 카운트 계산
       let warningDelta = 0;
       let positiveDelta = 0;
+      let observationDelta = 0;
       (tags || []).forEach(tid => {
         const t = TAGS.find(x => x.id === tid);
         if (t) {
           if (t.type === '부정') warningDelta++;
-          if (t.type === '긍정') positiveDelta++;
+          else if (t.type === '긍정') positiveDelta++;
+          else if (t.type === '관찰') observationDelta++;
         }
       });
 
@@ -1163,6 +1168,7 @@
       const prevStudentState = { ...state.students[stIndex] };
       state.students[stIndex].warningTagCount = Math.max(0, (state.students[stIndex].warningTagCount || 0) - warningDelta);
       state.students[stIndex].positiveTagCount = Math.max(0, (state.students[stIndex].positiveTagCount || 0) - positiveDelta);
+      state.students[stIndex].observationTagCount = Math.max(0, (state.students[stIndex].observationTagCount || 0) - observationDelta);
 
       showToast('기록을 삭제 중입니다...');
       renderStudents();
@@ -1183,7 +1189,8 @@
             transaction.delete(obsRef);
             transaction.update(stRef, {
               warningTagCount: Math.max(0, (currentData.warningTagCount || 0) - warningDelta),
-              positiveTagCount: Math.max(0, (currentData.positiveTagCount || 0) - positiveDelta)
+              positiveTagCount: Math.max(0, (currentData.positiveTagCount || 0) - positiveDelta),
+              observationTagCount: Math.max(0, (currentData.observationTagCount || 0) - observationDelta)
             });
           });
         }
@@ -1231,13 +1238,15 @@
           const stRef = doc(db, 'students', studentId);
           await updateDoc(stRef, {
             warningTagCount: 0,
-            positiveTagCount: 0
+            positiveTagCount: 0,
+            observationTagCount: 0
           });
         }
 
         // 로컬 업데이트
         state.students[stIndex].warningTagCount = 0;
         state.students[stIndex].positiveTagCount = 0;
+        state.students[stIndex].observationTagCount = 0;
         renderStudents();
         renderStats();
         openHistoryModal(studentId, studentName); // 목록 새로고침
@@ -1281,7 +1290,7 @@
           for (let i = 0; i < stDocs.length; i += 500) {
             const batch = writeBatch(db);
             stDocs.slice(i, i + 500).forEach(docSnap => {
-              batch.update(docSnap.ref, { warningTagCount: 0, positiveTagCount: 0 });
+              batch.update(docSnap.ref, { warningTagCount: 0, positiveTagCount: 0, observationTagCount: 0 });
             });
             await batch.commit();
           }
@@ -1291,6 +1300,7 @@
         state.students.forEach(s => {
           s.warningTagCount = 0;
           s.positiveTagCount = 0;
+          s.observationTagCount = 0;
         });
 
         renderStudents();
@@ -1347,12 +1357,14 @@
             // 카운트 필드 강제 초기화 (사용자 요청: 이전 데이터 초기화 대응)
             const warningTagCount = typeof data.warningTagCount === 'number' ? data.warningTagCount : 0;
             const positiveTagCount = typeof data.positiveTagCount === 'number' ? data.positiveTagCount : 0;
+            const observationTagCount = typeof data.observationTagCount === 'number' ? data.observationTagCount : 0;
 
             state.students.push({
               id: docSnap.id,
               ...data,
               warningTagCount,
-              positiveTagCount
+              positiveTagCount,
+              observationTagCount
             });
           });
         }
@@ -1500,7 +1512,7 @@
 
     DOM.btnAddStudentRow.addEventListener('click', () => {
       const maxNo = state.settingsStudents.reduce((max, s) => Math.max(max, s.studentNo || 0), 0);
-      state.settingsStudents.push({ name: '', studentNo: maxNo + 1, warningTagCount: 0, positiveTagCount: 0, isActive: true, className: state.settingsActiveClass });
+      state.settingsStudents.push({ name: '', studentNo: maxNo + 1, warningTagCount: 0, positiveTagCount: 0, observationTagCount: 0, isActive: true, className: state.settingsActiveClass });
       renderSettingsStudentList();
       setTimeout(() => { DOM.settingsStudentList.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
     });
@@ -1528,7 +1540,7 @@
 
           // 다음 토큰이 존재하고, '이름'이나 '성명' 같은 헤더가 아니며, 숫자로만 이루어지지 않은 경우 이름으로 인정
           if (nameStr !== '' && nameStr !== '이름' && nameStr !== '성명' && isNaN(parseInt(nameStr.replace(/[^0-9]/g, '')))) {
-            parsed.push({ studentNo: num, name: nameStr, warningTagCount: 0, positiveTagCount: 0, isActive: true, className: state.settingsActiveClass });
+            parsed.push({ studentNo: num, name: nameStr, warningTagCount: 0, positiveTagCount: 0, observationTagCount: 0, isActive: true, className: state.settingsActiveClass });
             i++; // 이름으로 사용한 토큰은 다음 숫자 탐색에서 건너뜀
           }
         }
@@ -1593,6 +1605,7 @@
               name: st.name,
               warningTagCount: st.warningTagCount,
               positiveTagCount: st.positiveTagCount,
+              observationTagCount: st.observationTagCount || 0,
               isActive: true,
               className: state.settingsActiveClass
             });
