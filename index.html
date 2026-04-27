@@ -1024,6 +1024,7 @@
     };
 
     const openHistoryModal = async (studentId, studentName) => {
+      state.activeStudentId = studentId; // 상태값 업데이트 추가 (삭제 기능 작동을 위해 필수)
       DOM.historyStudentName.textContent = `${studentName} 관찰 기록 상세`;
       DOM.historyModal.classList.remove('translate-y-full', 'pointer-events-none');
       DOM.historyModal.classList.add('translate-y-0');
@@ -1127,18 +1128,25 @@
         btn.addEventListener('click', async (e) => {
           e.stopPropagation();
           const obsId = e.currentTarget.dataset.id;
-          const tags = JSON.parse(e.currentTarget.dataset.tags);
+          const tags = JSON.parse(e.currentTarget.dataset.tags || '[]');
+          
+          // studentId를 데이터셋에서 직접 가져오거나 전역 상태에서 가져옴
+          const studentId = state.activeStudentId;
+          
           if (confirm('이 관찰 기록을 삭제하시겠습니까?')) {
-            await deleteHistoryRecord(obsId, tags);
+            await deleteHistoryRecord(obsId, tags, studentId);
           }
         });
       });
     };
 
-    const deleteHistoryRecord = async (obsId, tags) => {
-      const studentId = state.activeStudentId;
+    const deleteHistoryRecord = async (obsId, tags, studentIdArg) => {
+      const studentId = studentIdArg || state.activeStudentId;
       const stIndex = state.students.findIndex(s => s.id === studentId);
-      if (stIndex === -1) return;
+      if (stIndex === -1) {
+        showToast('학생 정보를 찾을 수 없어 삭제할 수 없습니다.', 'error');
+        return;
+      }
 
       // 차감될 카운트 계산
       let warningDelta = 0;
