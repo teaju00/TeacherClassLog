@@ -711,7 +711,8 @@
         return;
       }
 
-      const stIndex = state.students.findIndex(s => s.id === state.activeStudentId);
+      const targetStudentId = state.activeStudentId; // 로컬 변수에 캡처하여 상태 초기화 방어
+      const stIndex = state.students.findIndex(s => s.id === targetStudentId);
       if (stIndex === -1) return;
 
       // 1. 필요한 필드만 백업 (실패 시 롤백용)
@@ -719,7 +720,10 @@
 
       // 태그 연산
       let warningDelta = 0; let positiveDelta = 0;
-      Array.from(state.selectedTags).forEach(id => {
+      const currentTags = Array.from(state.selectedTags);
+      const currentMemo = DOM.memoInput.value.trim();
+
+      currentTags.forEach(id => {
         const t = TAGS.find(x => x.id === id);
         if (t.cat === '주의' || t.cat === '경고') warningDelta++;
         if (t.cat === '긍정' || t.cat === '학습' || t.cat === '생활') positiveDelta++;
@@ -730,7 +734,7 @@
       state.students[stIndex].positiveTagCount += positiveDelta;
       state.students[stIndex].lastObservedAt = new Date();
       renderStudents();        // 화면 즉시 리렌더링
-      closeBottomSheet();      // 체감 지연 0초
+      closeBottomSheet();      // 체감 지연 0초 (여기서 global state.activeStudentId = null 처리됨)
       showToast('성공적으로 저장되었습니다.');
 
       // 3. 백그라운드 서버 전송 (실패 시 롤백 수행)
@@ -744,13 +748,13 @@
         const obsRef = collection(db, 'observations');
         await addDoc(obsRef, {
           teacherUid: state.user.uid,
-          studentId: state.activeStudentId,
-          tags: Array.from(state.selectedTags),
-          memo: DOM.memoInput.value.trim(),
+          studentId: targetStudentId,
+          tags: currentTags,
+          memo: currentMemo,
           createdAt: serverTimestamp()
         });
 
-        const stRef = doc(db, 'students', state.activeStudentId);
+        const stRef = doc(db, 'students', targetStudentId);
         await runTransaction(db, async (transaction) => {
           const docSnap = await transaction.get(stRef);
           if (!docSnap.exists()) throw new Error("데이터 없음");
