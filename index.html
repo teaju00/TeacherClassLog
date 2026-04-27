@@ -417,15 +417,17 @@
   <!-- History Modal -->
   <div id="history-modal"
     class="fixed inset-0 bg-surface z-50 transform translate-y-full transition-transform duration-300 flex flex-col pointer-events-none">
-    <div
-      class="px-5 py-4 border-b border-borderDiv flex justify-between items-center bg-surface sticky top-0 pt-safe z-10 shadow-sm">
-      <h2 id="history-student-name" class="text-xl font-bold text-textPrimary">학생 기록 상세</h2>
-      <button id="btn-close-history" class="p-2 -mr-2 text-textSecondary active:bg-gray-100 rounded-full">
-        <svg fill="none" class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
+      <div class="flex justify-between items-center px-5 py-4 border-b border-borderDiv bg-surface sticky top-0 z-10 shadow-sm">
+        <h2 id="history-student-name" class="text-xl font-bold text-textPrimary">학생 기록 상세</h2>
+        <div class="flex items-center gap-2">
+          <button id="btn-delete-all-history" class="text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 active:bg-red-100 transition-colors">전체 삭제</button>
+          <button id="btn-close-history" class="p-2 -mr-2 text-textSecondary active:bg-gray-100 rounded-full">
+            <svg fill="none" class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
 
     <div class="flex-1 overflow-y-auto bg-gray-50 p-4">
       <ul id="history-list" class="space-y-3">
@@ -612,6 +614,7 @@
       historyModal: document.getElementById('history-modal'),
       historyStudentName: document.getElementById('history-student-name'),
       btnCloseHistory: document.getElementById('btn-close-history'),
+      btnDeleteAllHistory: document.getElementById('btn-delete-all-history'),
       historyList: document.getElementById('history-list'),
       historyLoading: document.getElementById('history-loading'),
       historyEmpty: document.getElementById('history-empty'),
@@ -1064,13 +1067,16 @@
         }).join('');
 
         return `
-                <li class="bg-white border text-left border-gray-200 rounded-xl p-4 shadow-sm flex flex-col gap-2">
+                <li class="bg-white border text-left border-gray-200 rounded-xl p-4 shadow-sm flex flex-col gap-2 relative group">
                     <div class="flex justify-between items-center border-b border-gray-100 pb-2">
                         <div class="text-xs font-bold text-gray-500 flex items-center">
                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                            ${dateStr} 
                            <span class="font-medium text-gray-400 ml-1.5">${timeStr}</span>
                         </div>
+                        <button class="btn-delete-history p-1 text-gray-300 hover:text-red-500 transition-colors" data-id="${r.id}" data-tags='${JSON.stringify(r.tags)}'>
+                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
                     </div>
                     <div class="flex flex-wrap gap-1.5 px-0.5">
                         ${tagsHtml || '<span class="text-xs text-gray-400">선택된 태그 없음</span>'}
@@ -1079,7 +1085,124 @@
                 </li>
             `;
       }).join('');
+
+      // 삭제 버튼 이벤트 바인딩
+      document.querySelectorAll('.btn-delete-history').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const obsId = e.currentTarget.dataset.id;
+          const tags = JSON.parse(e.currentTarget.dataset.tags);
+          if (confirm('이 관찰 기록을 삭제하시겠습니까?')) {
+            await deleteHistoryRecord(obsId, tags);
+          }
+        });
+      });
     };
+
+    const deleteHistoryRecord = async (obsId, tags) => {
+      const studentId = state.activeStudentId;
+      const stIndex = state.students.findIndex(s => s.id === studentId);
+      if (stIndex === -1) return;
+
+      // 차감될 카운트 계산
+      let warningDelta = 0;
+      let positiveDelta = 0;
+      tags.forEach(tid => {
+        const t = TAGS.find(x => x.id === tid);
+        if (t) {
+          if (t.type === '부정') warningDelta++;
+          if (t.type === '긍정') positiveDelta++;
+        }
+      });
+
+      // 낙관적 UI 업데이트
+      const prevStudentState = { ...state.students[stIndex] };
+      state.students[stIndex].warningTagCount = Math.max(0, state.students[stIndex].warningTagCount - warningDelta);
+      state.students[stIndex].positiveTagCount = Math.max(0, state.students[stIndex].positiveTagCount - positiveDelta);
+      
+      showToast('삭제 중입니다...');
+      renderStudents();
+      renderStats();
+      
+      // 실제 삭제 요청 (트랜잭션)
+      try {
+        if (state.user?.isDev) {
+          console.log('[DEV] Deleted locally');
+        } else {
+          const obsRef = doc(db, 'observations', obsId);
+          const stRef = doc(db, 'students', studentId);
+
+          await runTransaction(db, async (transaction) => {
+            const stSnap = await transaction.get(stRef);
+            if (!stSnap.exists()) throw new Error("학생 데이터가 없습니다.");
+            
+            transaction.delete(obsRef);
+            transaction.update(stRef, {
+              warningTagCount: Math.max(0, (stSnap.data().warningTagCount || 0) - warningDelta),
+              positiveTagCount: Math.max(0, (stSnap.data().positiveTagCount || 0) - positiveDelta)
+            });
+          });
+        }
+        showToast('성공적으로 삭제되었습니다.');
+        openHistoryModal(studentId, state.students[stIndex].name); // 목록 새로고침
+      } catch (err) {
+        console.error('Delete Error:', err);
+        state.students[stIndex] = prevStudentState; // 복구
+        renderStudents();
+        renderStats();
+        showToast('삭제 실패: ' + err.message, 'error');
+      }
+    };
+
+    const deleteAllRecordsForStudent = async () => {
+      const studentId = state.activeStudentId;
+      const stIndex = state.students.findIndex(s => s.id === studentId);
+      if (stIndex === -1) return;
+      const studentName = state.students[stIndex].name;
+
+      if (!confirm(`${studentName} 학생의 모든 관찰 기록을 삭제하고 카운트를 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+
+      showToast('모든 기록을 삭제 중입니다...');
+      
+      try {
+        if (state.user?.isDev) {
+          state.students[stIndex].warningTagCount = 0;
+          state.students[stIndex].positiveTagCount = 0;
+        } else {
+          // 1. 모든 해당 학생의 관찰 기록 조회
+          const obsRef = collection(db, 'observations');
+          const q = query(obsRef, where('teacherUid', '==', state.user.uid), where('studentId', '==', studentId));
+          const snapshot = await getDocs(q);
+
+          const batch = writeBatch(db);
+          snapshot.forEach(docSnap => {
+            batch.delete(docSnap.ref);
+          });
+
+          // 2. 학생 카운트 리셋
+          const stRef = doc(db, 'students', studentId);
+          batch.update(stRef, {
+            warningTagCount: 0,
+            positiveTagCount: 0
+          });
+
+          await batch.commit();
+        }
+
+        // 로컬 업데이트
+        state.students[stIndex].warningTagCount = 0;
+        state.students[stIndex].positiveTagCount = 0;
+        renderStudents();
+        renderStats();
+        openHistoryModal(studentId, studentName); // 목록 새로고침
+        showToast('모든 기록이 삭제되었습니다.');
+      } catch (err) {
+        console.error('Delete All Error:', err);
+        showToast('전체 삭제 실패: ' + err.message, 'error');
+      }
+    };
+
+    DOM.btnDeleteAllHistory.addEventListener('click', deleteAllRecordsForStudent);
 
     DOM.btnCloseHistory.addEventListener('click', () => {
       DOM.historyModal.classList.add('translate-y-full', 'pointer-events-none');
@@ -1121,7 +1244,17 @@
           snapshot.forEach(docSnap => {
             const data = docSnap.data();
             if (!data.className) data.className = '기본 학급'; // 하위 호환성 폴백
-            state.students.push({ id: docSnap.id, ...data });
+            
+            // 카운트 필드 강제 초기화 (사용자 요청: 이전 데이터 초기화 대응)
+            const warningTagCount = typeof data.warningTagCount === 'number' ? data.warningTagCount : 0;
+            const positiveTagCount = typeof data.positiveTagCount === 'number' ? data.positiveTagCount : 0;
+            
+            state.students.push({ 
+              id: docSnap.id, 
+              ...data,
+              warningTagCount,
+              positiveTagCount
+            });
           });
         }
 
