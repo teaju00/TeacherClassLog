@@ -1754,39 +1754,27 @@
 
       // Bind move events
       DOM.classOrderList.querySelectorAll('.btn-order-up').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
+        btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const index = parseInt(btn.dataset.index);
           if (index > 0) {
             const arr = state.settings.classOrder;
             [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
             
-            // 전역 학급 목록도 동기화 (즉시 UI 반영을 위해)
-            state.classes = [...state.settings.classOrder];
-            
             renderClassOrderUI();
-            await saveSettings();
-            renderClassesDropdown();
-            showToast('순서가 변경되어 저장되었습니다.');
           }
         });
       });
 
       DOM.classOrderList.querySelectorAll('.btn-order-down').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
+        btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const index = parseInt(btn.dataset.index);
           if (index < state.settings.classOrder.length - 1) {
             const arr = state.settings.classOrder;
             [arr[index + 1], arr[index]] = [arr[index], arr[index + 1]];
             
-            // 전역 학급 목록도 동기화
-            state.classes = [...state.settings.classOrder];
-            
             renderClassOrderUI();
-            await saveSettings();
-            renderClassesDropdown();
-            showToast('순서가 변경되어 저장되었습니다.');
           }
         });
       });
