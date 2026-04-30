@@ -571,7 +571,7 @@
     //==========================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, getDoc, doc, updateDoc, increment, serverTimestamp, query, where, orderBy, limit, setDoc, writeBatch, runTransaction } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getFirestore, initializeFirestore, collection, addDoc, getDocs, getDoc, doc, updateDoc, increment, serverTimestamp, query, where, orderBy, limit, setDoc, writeBatch, runTransaction } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
     // Firebase 웹 앱 설정 (선생님 발급 키 적용 완료)
     const firebaseConfig = {
@@ -585,7 +585,10 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
+    // [Fix] 광고 차단기 환경에서도 통신이 원활하도록 롱 폴링 옵션 적용
+    const db = initializeFirestore(app, {
+      experimentalAutoDetectLongPolling: true
+    });
     const provider = new GoogleAuthProvider();
 
     //==========================================
