@@ -25,6 +25,10 @@
         {
           "fieldPath": "studentId",
           "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
         }
       ]
     }

@@ -490,7 +490,7 @@
     //==========================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, serverTimestamp, query, where, orderBy, setDoc, writeBatch, runTransaction } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, serverTimestamp, query, where, orderBy, limit, setDoc, writeBatch, runTransaction } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
     // Firebase 웹 앱 설정 (선생님 발급 키 적용 완료)
     const firebaseConfig = {
@@ -991,11 +991,11 @@
       if (classChartInstance) classChartInstance.destroy();
       if (!DOM.classChart || typeof Chart === 'undefined') return;
 
-      const posTotal = activeStudents.reduce((acc, s) => acc + s.positiveTagCount, 0);
-      const negTotal = activeStudents.reduce((acc, s) => acc + s.warningTagCount, 0);
+      const posTotal = activeStudents.reduce((acc, s) => acc + (s.positiveTagCount || 0), 0);
+      const negTotal = activeStudents.reduce((acc, s) => acc + (s.warningTagCount || 0), 0);
 
       // 피드백 데이터가 전혀 없을 경우 더미 플레이스홀더 출력 처리
-      const hasData = posTotal > 0 || negTotal > 0;
+      const hasData = (posTotal > 0 || negTotal > 0);
 
       classChartInstance = new Chart(DOM.classChart, {
         type: 'doughnut',
@@ -1181,6 +1181,7 @@
           const obsRef = doc(db, 'observations', obsId);
           const stRef = doc(db, 'students', studentId);
 
+          // 1. 기록 삭제 및 카운트 차감 트랜잭션
           await runTransaction(db, async (transaction) => {
             const stSnap = await transaction.get(stRef);
             if (!stSnap.exists()) throw new Error("학생 데이터가 없습니다.");
@@ -1193,12 +1194,33 @@
               observationTagCount: Math.max(0, (currentData.observationTagCount || 0) - observationDelta)
             });
           });
+
+          // 2. 최종 관찰일(lastObservedAt) 재계산 및 갱신
+          const obsColRef = collection(db, 'observations');
+          const q = query(
+            obsColRef,
+            where('teacherUid', '==', state.user.uid),
+            where('studentId', '==', studentId),
+            orderBy('createdAt', 'desc'),
+            limit(1)
+          );
+          const latestSnap = await getDocs(q);
+          
+          let newLastDate = null;
+          if (!latestSnap.empty) {
+            newLastDate = latestSnap.docs[0].data().createdAt;
+          }
+          
+          await updateDoc(stRef, { lastObservedAt: newLastDate });
+          state.students[stIndex].lastObservedAt = newLastDate;
         }
+
         showToast('기록이 삭제되었습니다.');
+        renderStats(); // 갱신된 데이터로 통계 뷰 다시 렌더링
         openHistoryModal(studentId, state.students[stIndex].name);
       } catch (err) {
         console.error('Delete Error:', err);
-        state.students[stIndex] = prevStudentState; // 복구
+        state.students[stIndex] = prevStudentState; // 롤백
         renderStudents();
         renderStats();
         showToast('삭제 실패: ' + (err.code || err.message), 'error');
