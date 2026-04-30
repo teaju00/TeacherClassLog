@@ -72,6 +72,7 @@
     .rotate-180 {
       transform: rotate(180deg);
     }
+
     .transition-transform {
       transition: transform 0.3s ease;
     }
@@ -141,10 +142,12 @@
       <!-- Stats Dashbaord Tab -->
       <div id="stats-tab" class="hide px-4 mt-6 fade-in">
         <!-- Section: Chart -->
-        <div class="bg-surface rounded-xl shadow-sm border border-borderDiv p-5 font-sans mb-4 stats-section" data-section="chart">
+        <div class="bg-surface rounded-xl shadow-sm border border-borderDiv p-5 font-sans mb-4 stats-section"
+          data-section="chart">
           <div class="flex justify-between items-center cursor-pointer stats-header" data-section="chart">
             <h3 class="text-base font-bold text-textPrimary">현재 학급 성향 분포</h3>
-            <svg class="w-5 h-5 text-gray-400 transition-transform toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-400 transition-transform toggle-icon" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
           </div>
@@ -156,7 +159,8 @@
         </div>
 
         <!-- Section: Warning -->
-        <div class="mt-4 bg-surface rounded-xl shadow-sm border border-borderDiv p-5 stats-section" data-section="warning">
+        <div class="mt-4 bg-surface rounded-xl shadow-sm border border-borderDiv p-5 stats-section"
+          data-section="warning">
           <div class="flex justify-between items-center cursor-pointer stats-header" data-section="warning">
             <h3 class="text-base font-bold text-red-600 flex items-center">
               <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,7 +170,8 @@
               </svg>
               우선 관심 학생
             </h3>
-            <svg class="w-5 h-5 text-gray-400 transition-transform toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-400 transition-transform toggle-icon" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
           </div>
@@ -178,7 +183,8 @@
         </div>
 
         <!-- Section: Unobserved -->
-        <div class="mt-4 bg-surface rounded-xl shadow-sm border border-borderDiv p-5 stats-section" data-section="unobserved">
+        <div class="mt-4 bg-surface rounded-xl shadow-sm border border-borderDiv p-5 stats-section"
+          data-section="unobserved">
           <div class="flex justify-between items-center cursor-pointer stats-header" data-section="unobserved">
             <h3 class="text-base font-bold text-indigo-600 flex items-center">
               <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,7 +193,8 @@
               </svg>
               관찰이 필요한 학생 (최근 기록 없음)
             </h3>
-            <svg class="w-5 h-5 text-gray-400 transition-transform toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-400 transition-transform toggle-icon" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
           </div>
@@ -199,7 +206,8 @@
         </div>
 
         <!-- Section: All -->
-        <div class="mt-4 bg-surface rounded-xl shadow-sm border border-borderDiv p-5 mb-10 stats-section" data-section="all">
+        <div class="mt-4 bg-surface rounded-xl shadow-sm border border-borderDiv p-5 mb-10 stats-section"
+          data-section="all">
           <div class="flex justify-between items-center cursor-pointer stats-header" data-section="all">
             <h3 class="text-base font-bold text-textPrimary flex items-center">
               <svg class="w-5 h-5 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +217,8 @@
               </svg>
               전체 학생 명단
             </h3>
-            <svg class="w-5 h-5 text-gray-400 transition-transform toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-400 transition-transform toggle-icon" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
           </div>
@@ -362,15 +371,18 @@
 
     <div class="flex-1 overflow-y-auto p-5 pb-32">
       <!-- Section: Class Order Management (Collapsible) -->
-      <div class="bg-surface rounded-xl shadow-sm border border-borderDiv p-5 font-sans mb-6 settings-section" data-section="classOrder">
+      <div class="bg-surface rounded-xl shadow-sm border border-borderDiv p-5 font-sans mb-6 settings-section"
+        data-section="classOrder">
         <div class="flex justify-between items-center cursor-pointer settings-header" data-section="classOrder">
           <h3 class="text-base font-bold text-textPrimary flex items-center">
             <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
             </svg>
             학급 표시 순서 설정
           </h3>
-          <svg class="w-5 h-5 text-gray-400 transition-transform toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 text-gray-400 transition-transform toggle-icon" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
           </svg>
         </div>
@@ -486,7 +498,7 @@
     <div class="p-4 border-t border-borderDiv bg-surface pb-safe sticky bottom-0">
       <button id="btn-save-settings"
         class="w-full h-14 bg-primary text-white font-medium text-lg rounded-xl shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center">
-        명단 일괄 저장
+        저장
       </button>
     </div>
   </div>
@@ -734,13 +746,13 @@
       btnCsvAppend: document.getElementById('btn-csv-append'),
       btnCsvCancel: document.getElementById('btn-csv-cancel'),
       csvParsedCount: document.getElementById('csv-parsed-count'),
-      
+
       // Class Order
       classOrderList: document.getElementById('class-order-list'),
-      
+
       // Class Editing
       btnEditClassName: document.getElementById('btn-edit-class-name'),
-      
+
       // Stats Header elements
       statsHeaders: document.querySelectorAll('.stats-header'),
     };
@@ -1106,7 +1118,7 @@
         const isCollapsed = state.settings.collapsedStats.includes(sectionId);
         const content = section.querySelector('.stats-content');
         const icon = section.querySelector('.toggle-icon');
-        
+
         if (isCollapsed) {
           content.classList.add('hide');
           icon.classList.add('rotate-180');
@@ -1230,10 +1242,10 @@
           e.stopPropagation();
           const obsId = e.currentTarget.dataset.id;
           const tags = JSON.parse(e.currentTarget.dataset.tags || '[]');
-          
+
           // studentId를 데이터셋에서 직접 가져오거나 전역 상태에서 가져옴
           const studentId = state.activeStudentId;
-          
+
           if (confirm('이 관찰 기록을 삭제하시겠습니까?')) {
             await deleteHistoryRecord(obsId, tags, studentId);
           }
@@ -1303,12 +1315,12 @@
             limit(1)
           );
           const latestSnap = await getDocs(q);
-          
+
           let newLastDate = null;
           if (!latestSnap.empty) {
             newLastDate = latestSnap.docs[0].data().createdAt;
           }
-          
+
           await updateDoc(stRef, { lastObservedAt: newLastDate });
           state.students[stIndex].lastObservedAt = newLastDate;
         }
@@ -1394,7 +1406,7 @@
           const q = query(obsRef, where('teacherUid', '==', state.user.uid));
           const snapshot = await getDocs(q);
           const obsDocs = snapshot.docs;
-          
+
           for (let i = 0; i < obsDocs.length; i += 500) {
             const batch = writeBatch(db);
             obsDocs.slice(i, i + 500).forEach(docSnap => batch.delete(docSnap.ref));
@@ -1486,7 +1498,7 @@
         const isCollapsed = state.settings.collapsedStats.includes(sectionId);
         const content = section.querySelector('.settings-content');
         const icon = section.querySelector('.toggle-icon');
-        
+
         if (isCollapsed) {
           content.classList.add('hide');
           icon.classList.add('rotate-180');
@@ -1535,35 +1547,19 @@
 
         // 보유 학급 추출 및 세팅
         const derivedClasses = Array.from(new Set(state.students.filter(s => s.isActive !== false).map(s => s.className)));
-        
-        // 설정에 저장된 순서가 있으면 그에 따르고, 없으면 가나다순
-        if (state.settings.classOrder && state.settings.classOrder.length > 0) {
-          const ordered = [];
-          state.settings.classOrder.forEach(c => {
-            if (derivedClasses.includes(c)) ordered.push(c);
-          });
-          // 설정에 없는 새로운 학급은 뒤에 추가
-          derivedClasses.forEach(c => {
-            if (!ordered.includes(c)) ordered.push(c);
-          });
-          state.classes = ordered;
-        } else {
-          state.classes = derivedClasses.sort();
-        }
+
+        // 설정에 저장된 순서에 따라 정렬 (설정에 없는 새로운 학급은 가나다순으로 뒤에 추가)
+        state.classes = derivedClasses.sort((a, b) => {
+          const idxA = (state.settings.classOrder || []).indexOf(a);
+          const idxB = (state.settings.classOrder || []).indexOf(b);
+          
+          if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+          if (idxA === -1) return 1;
+          if (idxB === -1) return -1;
+          return idxA - idxB;
+        });
 
         if (state.classes.length === 0) state.classes = ['기본 학급'];
-        
-        // 정렬 순서를 state.classes에 강제 적용 (다른 기기 연동 및 새로고침 대응)
-        if (state.settings.classOrder && state.settings.classOrder.length > 0) {
-          state.classes.sort((a, b) => {
-            const idxA = state.settings.classOrder.indexOf(a);
-            const idxB = state.settings.classOrder.indexOf(b);
-            if (idxA === -1 && idxB === -1) return a.localeCompare(b);
-            if (idxA === -1) return 1;
-            if (idxB === -1) return -1;
-            return idxA - idxB;
-          });
-        }
 
         if (!state.activeClass || !state.classes.includes(state.activeClass)) {
           state.activeClass = state.classes[0];
@@ -1723,7 +1719,7 @@
     const renderClassOrderUI = () => {
       if (!DOM.classOrderList) return;
       DOM.classOrderList.innerHTML = '';
-      
+
       // Ensure all current classes are in classOrder
       state.classes.forEach(cls => {
         if (!state.settings.classOrder.includes(cls)) {
@@ -1758,9 +1754,14 @@
           if (index > 0) {
             const arr = state.settings.classOrder;
             [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
+            
+            // 전역 학급 목록도 동기화 (즉시 UI 반영을 위해)
+            state.classes = [...state.settings.classOrder];
+            
             renderClassOrderUI();
             await saveSettings();
-            renderClassesDropdown(); 
+            renderClassesDropdown();
+            showToast('순서가 변경되어 저장되었습니다.');
           }
         });
       });
@@ -1772,9 +1773,14 @@
           if (index < state.settings.classOrder.length - 1) {
             const arr = state.settings.classOrder;
             [arr[index + 1], arr[index]] = [arr[index], arr[index + 1]];
+            
+            // 전역 학급 목록도 동기화
+            state.classes = [...state.settings.classOrder];
+            
             renderClassOrderUI();
             await saveSettings();
             renderClassesDropdown();
+            showToast('순서가 변경되어 저장되었습니다.');
           }
         });
       });
@@ -1802,23 +1808,23 @@
       const oldName = state.settingsActiveClass;
       const newName = prompt('학급 이름을 수정하세요:', oldName);
       if (!newName || newName.trim() === '' || newName === oldName) return;
-      
+
       const cleanName = newName.trim();
-      
+
       // 1. 학급 목록에서 이름 교체
       const idx = state.classes.indexOf(oldName);
       if (idx !== -1) {
         state.classes[idx] = cleanName;
       }
-      
+
       // 2. 현재 편집 중인 학급 이름 변경
       state.settingsActiveClass = cleanName;
-      
+
       // 3. 현재 로컬 명단의 className 모두 변경
       state.settingsStudents.forEach(s => {
         s.className = cleanName;
       });
-      
+
       // 4. 전역 학생 데이터 중 해당 학급 학생들의 className도 변경 (저장 시 DB 반영을 위해)
       state.students.forEach(s => {
         if (s.className === oldName) s.className = cleanName;
@@ -1833,7 +1839,7 @@
       showToast(`학급 이름이 '${oldName}'에서 '${cleanName}'으로 변경되었습니다. (저장 버튼을 눌러야 반영됩니다)`);
       renderClassesDropdown();
       loadSettingsForCurrentClass();
-      saveSettings();
+      await saveSettings();
     });
 
     DOM.btnSettings.addEventListener('click', () => {
@@ -1933,11 +1939,11 @@
           if (st.id) {
             // Update 기존
             const ref = doc(db, 'students', st.id);
-            batch.update(ref, { 
-              studentNo: st.studentNo, 
-              name: st.name, 
+            batch.update(ref, {
+              studentNo: st.studentNo,
+              name: st.name,
               isActive: st.isActive !== false,
-              className: st.className || state.settingsActiveClass 
+              className: st.className || state.settingsActiveClass
             });
             syncCount++;
           } else if (st.isActive !== false) {
@@ -1989,7 +1995,10 @@
         DOM.settingsModal.classList.add('translate-y-full', 'pointer-events-none');
         DOM.settingsModal.classList.remove('translate-y-0');
 
-        if (!state.user?.isDev) await fetchStudents();
+        if (!state.user?.isDev) {
+          await saveSettings(); // 학급 순서나 이름 변경 사항이 있을 수 있으므로 함께 저장
+          await fetchStudents();
+        }
       } catch (error) {
         console.error(error);
         if (error.message === 'timeout') {
@@ -1998,7 +2007,7 @@
           showToast('Firestore 데이터 저장에 실패했습니다. (네트워크/방화벽 확인)', 'error');
         }
       } finally {
-        DOM.btnSaveSettings.innerHTML = '명단 일괄 저장';
+        DOM.btnSaveSettings.innerHTML = '저장';
         DOM.btnSaveSettings.disabled = false;
       }
     });
