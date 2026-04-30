@@ -38,6 +38,11 @@ service cloud.firestore {
       // 기록은 수정 불가
       allow update: if false;
     }
+
+    // 3. 선생님 개인 설정 데이터
+    match /teachers/{teacherUid} {
+      allow get, write: if isOwner(teacherUid);
+    }
   }
 }
 
