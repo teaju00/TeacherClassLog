@@ -1598,24 +1598,29 @@
           const data = docSnap.data();
           state.settings.classOrder = data.classOrder || [];
           state.settings.collapsedStats = data.collapsedStats || [];
+          console.log('[Settings] Fetch successful:', state.settings.classOrder);
         }
       } catch (err) {
-        console.error('Settings Load Error:', err);
+        console.error('[Settings] Load Error:', err);
       }
     };
 
-    // 설정 데이터 저장
     const saveSettings = async () => {
-      if (!state.user || state.user.isDev) return;
+      if (!state.user || state.user.isDev) {
+        if (state.user?.isDev) console.log('[Settings] Dev mode - bypass server save');
+        return;
+      }
       try {
         const docRef = doc(db, 'teachers', state.user.uid);
-        await setDoc(docRef, {
+        const saveData = {
           classOrder: state.settings.classOrder,
           collapsedStats: state.settings.collapsedStats,
           updatedAt: serverTimestamp()
-        }, { merge: true });
+        };
+        await setDoc(docRef, saveData, { merge: true });
+        console.log('[Settings] Saved to Firestore:', state.settings.classOrder);
       } catch (err) {
-        console.error('Settings Save Error:', err);
+        console.error('[Settings] Save Error:', err);
       }
     };
 
@@ -1720,14 +1725,12 @@
       if (!DOM.classOrderList) return;
       DOM.classOrderList.innerHTML = '';
 
-      // Ensure all current classes are in classOrder
       state.classes.forEach(cls => {
         if (!state.settings.classOrder.includes(cls)) {
           state.settings.classOrder.push(cls);
         }
       });
-      // Filter out deleted classes
-      state.settings.classOrder = state.settings.classOrder.filter(cls => state.classes.includes(cls));
+      // [Fix] 현재 목록에 없더라도 설정된 순서 정보는 함부로 지우지 않음 (필터링 제거)
 
       state.settings.classOrder.forEach((cls, index) => {
         const item = document.createElement('div');
@@ -1791,16 +1794,23 @@
       loadSettingsForCurrentClass();
     });
 
-    DOM.btnAddClass.addEventListener('click', () => {
+    DOM.btnAddClass.addEventListener('click', async () => {
       const newClass = prompt('새로운 반 이름을 입력하세요:', '2학년 3반');
       if (!newClass || newClass.trim() === '') return;
       const clName = newClass.trim();
       if (!state.classes.includes(clName)) {
         state.classes.push(clName);
-        renderClassesDropdown(); // Main 헤더에도 미리 옵션 반영
+        renderClassesDropdown(); 
       }
       state.settingsActiveClass = clName;
       state.settingsStudents = [];
+      
+      // 새 학급 추가 시 순서 설정에 반영하고 즉시 저장
+      if (!state.settings.classOrder.includes(clName)) {
+        state.settings.classOrder.push(clName);
+      }
+      await saveSettings();
+      
       loadSettingsForCurrentClass();
     });
 
