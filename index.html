@@ -1804,7 +1804,7 @@
       loadSettingsForCurrentClass();
     });
 
-    DOM.btnEditClassName.addEventListener('click', () => {
+    DOM.btnEditClassName.addEventListener('click', async () => {
       const oldName = state.settingsActiveClass;
       const newName = prompt('학급 이름을 수정하세요:', oldName);
       if (!newName || newName.trim() === '' || newName === oldName) return;
