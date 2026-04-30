@@ -361,6 +361,27 @@
     </div>
 
     <div class="flex-1 overflow-y-auto p-5 pb-32">
+      <!-- Section: Class Order Management (Collapsible) -->
+      <div class="bg-surface rounded-xl shadow-sm border border-borderDiv p-5 font-sans mb-6 settings-section" data-section="classOrder">
+        <div class="flex justify-between items-center cursor-pointer settings-header" data-section="classOrder">
+          <h3 class="text-base font-bold text-textPrimary flex items-center">
+            <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
+            </svg>
+            학급 표시 순서 설정
+          </h3>
+          <svg class="w-5 h-5 text-gray-400 transition-transform toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+        <div class="settings-content mt-4">
+          <div id="class-order-list" class="space-y-2 bg-gray-50 border border-gray-100 rounded-xl p-3 shadow-inner">
+            <!-- JS generated list -->
+          </div>
+          <p class="text-[11px] text-gray-400 mt-2 text-center">버튼을 눌러 학급의 표시 순서를 변경할 수 있습니다.</p>
+        </div>
+      </div>
+
       <!-- Class Editing Context -->
       <div class="mb-4">
         <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2">편집할 학급 선택</label>
@@ -425,15 +446,6 @@
 
       <!-- Account & Danger Zone Redesign -->
       <div class="mt-16 space-y-8 pb-10">
-        <!-- Class Order Management -->
-        <div class="border-t border-gray-100 pt-8 mb-4">
-          <h4 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 px-1">학급 표시 순서 설정</h4>
-          <div id="class-order-list" class="space-y-2 bg-white border border-borderDiv rounded-xl p-3 shadow-sm">
-            <!-- JS generated list -->
-          </div>
-          <p class="text-[11px] text-gray-400 mt-2 text-center">버튼을 눌러 학급의 표시 순서를 변경할 수 있습니다.</p>
-        </div>
-
         <!-- Account Section -->
         <div class="border-t border-gray-100 pt-8">
           <h4 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 px-1">계정 관리</h4>
@@ -1441,13 +1453,13 @@
       renderStats(); // 탭 이동 시 렌더링
     });
 
-    // 통계 섹션 토글 이벤트 바인딩
-    const initStatsToggles = () => {
-      document.querySelectorAll('.stats-header').forEach(header => {
+    // 섹션 토글 이벤트 바인딩 (통계 및 설정 공통)
+    const initToggles = () => {
+      document.querySelectorAll('.stats-header, .settings-header').forEach(header => {
         header.addEventListener('click', async () => {
           const sectionId = header.dataset.section;
-          const section = header.closest('.stats-section');
-          const content = section.querySelector('.stats-content');
+          const section = header.closest('.stats-section, .settings-section');
+          const content = section.querySelector('.stats-content, .settings-content');
           const icon = header.querySelector('.toggle-icon');
 
           const isCollapsed = content.classList.toggle('hide');
@@ -1465,7 +1477,25 @@
         });
       });
     };
-    initStatsToggles();
+    initToggles();
+
+    // 설정 모달 열릴 때 접힘 상태 적용
+    const applySettingsCollapsedStates = () => {
+      document.querySelectorAll('.settings-section').forEach(section => {
+        const sectionId = section.dataset.section;
+        const isCollapsed = state.settings.collapsedStats.includes(sectionId);
+        const content = section.querySelector('.settings-content');
+        const icon = section.querySelector('.toggle-icon');
+        
+        if (isCollapsed) {
+          content.classList.add('hide');
+          icon.classList.add('rotate-180');
+        } else {
+          content.classList.remove('hide');
+          icon.classList.remove('rotate-180');
+        }
+      });
+    };
 
 
 
@@ -1522,6 +1552,19 @@
         }
 
         if (state.classes.length === 0) state.classes = ['기본 학급'];
+        
+        // 정렬 순서를 state.classes에 강제 적용 (다른 기기 연동 및 새로고침 대응)
+        if (state.settings.classOrder && state.settings.classOrder.length > 0) {
+          state.classes.sort((a, b) => {
+            const idxA = state.settings.classOrder.indexOf(a);
+            const idxB = state.settings.classOrder.indexOf(b);
+            if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+            if (idxA === -1) return 1;
+            if (idxB === -1) return -1;
+            return idxA - idxB;
+          });
+        }
+
         if (!state.activeClass || !state.classes.includes(state.activeClass)) {
           state.activeClass = state.classes[0];
         }
@@ -1796,6 +1839,7 @@
     DOM.btnSettings.addEventListener('click', () => {
       state.settingsActiveClass = state.activeClass || state.classes[0];
       loadSettingsForCurrentClass();
+      applySettingsCollapsedStates();
       DOM.settingsModal.classList.remove('translate-y-full', 'pointer-events-none');
       DOM.settingsModal.classList.add('translate-y-0');
     });
